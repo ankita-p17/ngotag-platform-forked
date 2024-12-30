@@ -1,9 +1,6 @@
 # Stage 1: Build the application
 FROM node:18-slim as build
-RUN npm install -g pnpm --ignore-scripts \
-  && apk update \
-  && apk add openssl
-
+RUN npm install -g pnpm
 RUN apt-get update -y
 RUN apt-get --no-install-recommends install -y openssl
 # Set the working directory
@@ -30,9 +27,7 @@ RUN apt-get update -y
 RUN apt-get --no-install-recommends install -y openssl
 # Set the working directory
 WORKDIR /app
-RUN npm install -g pnpm --ignore-scripts \
-  && apk update \
-  && apk add openssl
+RUN npm install -g pnpm
 
 # Copy the compiled code from the build stage
 COPY --from=build /app/dist/apps/utility/ ./dist/apps/utility/
