@@ -100,7 +100,11 @@ export class UserRepository {
     try {
       return this.prisma.user.findFirst({
         where: {
-          email
+          OR:[
+            {email},
+            {username: email}
+          ]
+          
         }
       });
     } catch (error) {

@@ -30,11 +30,11 @@ export class CloudWalletRepository {
   }
 
   // eslint-disable-next-line camelcase
-  async checkUserExist(email: string): Promise<cloud_wallet_user_info> {
+  async checkUserExist(userId: string): Promise<cloud_wallet_user_info> {
     try {
       const agentDetails = await this.prisma.cloud_wallet_user_info.findUnique({
         where: {
-          email
+          userId
         }
       });
       return agentDetails;
@@ -80,11 +80,11 @@ export class CloudWalletRepository {
   }
 
   // eslint-disable-next-line camelcase
-  async getCloudWalletInfo(email: string): Promise<cloud_wallet_user_info> {
+  async getCloudWalletInfo(userId: string): Promise<cloud_wallet_user_info> {
     try {
       const walletInfoData = await this.prisma.cloud_wallet_user_info.findUnique({
         where: {
-          email
+          userId
         }
       });
       return walletInfoData;

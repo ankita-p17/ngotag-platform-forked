@@ -8,6 +8,7 @@ export interface JwtPayload {
     scope: string;
     gty?: string;
     permissions: string[];
-    email?: string
+    email?: string;
+    preferred_username: string;
   }
   

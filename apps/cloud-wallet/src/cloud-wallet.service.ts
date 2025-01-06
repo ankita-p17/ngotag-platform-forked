@@ -68,7 +68,7 @@ export class CloudWalletService {
         throw new BadRequestException(ResponseMessages.cloudWallet.error.notReachable);
       }
 
-      const existingWalletInfo = await this.cloudWalletRepository.getCloudWalletInfo(email);
+      const existingWalletInfo = await this.cloudWalletRepository.getCloudWalletInfo(userId);
       if (existingWalletInfo) {
         throw new ConflictException(ResponseMessages.cloudWallet.error.agentAlreadyExist);
       }
@@ -248,7 +248,7 @@ export class CloudWalletService {
         }
       };
 
-      const checkUserExist = await this.cloudWalletRepository.checkUserExist(email);
+      const checkUserExist = await this.cloudWalletRepository.checkUserExist(userId);
 
       if (checkUserExist) {
         throw new ConflictException(ResponseMessages.cloudWallet.error.userExist);

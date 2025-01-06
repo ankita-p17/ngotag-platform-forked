@@ -165,7 +165,6 @@ export class ClientRegistrationService {
       await this.keycloakUrlService.getUserByUsernameURL(realm, user.username),
       this.getAuthHeader(token)
     );
-    console.log(getUserResponse);
     const userid = getUserResponse[0].id;
 
 

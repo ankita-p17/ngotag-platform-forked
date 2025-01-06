@@ -612,13 +612,13 @@ model cloud_wallet_user_info {
   id                  String          @id @default(uuid()) @db.Uuid
   label               String?
   tenantId            String?
-  email               String?         @unique() @db.VarChar(500)
+  email               String?         @db.VarChar(500)
   type                CloudWalletType
   createDateTime      DateTime        @default(now()) @db.Timestamptz(6)
   createdBy           String          @db.Uuid
   lastChangedDateTime DateTime        @default(now()) @db.Timestamptz(6)
   lastChangedBy       String          @db.Uuid
-  userId              String?          @db.Uuid
+  userId              String?         @unique() @db.Uuid
   agentEndpoint       String?
   agentApiKey         String?
   key                 String?
