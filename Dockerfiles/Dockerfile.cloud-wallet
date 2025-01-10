@@ -1,8 +1,8 @@
 # Stage 1: Build the application
 FROM node:18-slim as build
 RUN npm install -g pnpm --ignore-scripts \
-  && apk update \
-  && apk add openssl
+  && apt-get update \
+  && apt-get install -y openssl
 
 # Set the working directory
 WORKDIR /app
@@ -28,8 +28,8 @@ FROM node:18-slim
 WORKDIR /app
 
 RUN npm install -g pnpm --ignore-scripts \
-  && apk update \
-  && apk add openssl
+  && apt-get update \
+  && apt-get install -y openssl
 
 # Copy the compiled code from the build stage
 COPY --from=build /app/dist/apps/cloud-wallet/ ./dist/apps/cloud-wallet/
