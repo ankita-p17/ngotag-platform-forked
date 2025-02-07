@@ -68,6 +68,7 @@ export interface ICreateCloudWalletDid {
   endorserDid?: string;
   email?: string;
   userId?: string;
+  isDefault?: boolean;
 }
 export interface IGetStoredWalletInfo {
   email: string;
@@ -150,6 +151,8 @@ export interface ICloudBaseWalletConfigure {
   agentEndpoint: string;
   userId: string;
   email: string;
+  webhookUrl: string;
+  orgId: string;
 }
 
 export interface Tags {
@@ -192,6 +195,7 @@ export interface CloudWallet {
 export interface IWalletDetailsForDidList {
   userId: string;
   email: string;
+  isDefault: boolean
 }
 
 export interface IConnectionDetailsById {

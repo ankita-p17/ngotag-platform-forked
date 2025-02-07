@@ -1226,6 +1226,11 @@ export class AgentServiceService {
     }
   }
 
+   async createNewOrgAgent(data: Prisma.org_agentsCreateInput): Promise<ICreateOrgAgent> {
+  return this.agentServiceRepository.createUniqueOrgAgent(data);
+  }
+
+
   async createSchema(payload: ITenantSchema): Promise<object> {
     try {
       const getApiKey = await this.getOrgAgentApiKey(payload.orgId);

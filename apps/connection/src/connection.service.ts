@@ -24,7 +24,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { IConnectionList, ICreateConnectionUrl, IDeletedConnectionsRecord } from '@credebl/common/interfaces/connection.interface';
 import { IConnectionDetailsById } from 'apps/api-gateway/src/interfaces/IConnectionSearch.interface';
 import { IBasicMessage, IQuestionPayload } from './interfaces/messaging.interfaces';
-import { RecordType, user } from '@prisma/client';
+import { org_agents, RecordType, user } from '@prisma/client';
 import { UserActivityRepository } from 'libs/user-activity/repositories';
 import { agent_invitations } from '@prisma/client';
 @Injectable()
@@ -43,10 +43,10 @@ export class ConnectionService {
    * @param orgId
    * @returns Callback URL for connection and created connections details
    */
-  async getConnectionWebhook(payload: ICreateConnection): Promise<object> {
+  async getConnectionWebhook(payload: ICreateConnection): Promise<org_agents> {
     try {
-      const saveConnectionDetails = await this.connectionRepository.saveConnectionWebhook(payload);
-      return saveConnectionDetails;
+      const orgAgent = await this.connectionRepository.saveConnectionWebhook(payload);
+      return orgAgent;
     } catch (error) {
       this.logger.error(`[getConnectionWebhook] - error in fetch connection webhook: ${error}`);
       throw new RpcException(error.response ? error.response : error);

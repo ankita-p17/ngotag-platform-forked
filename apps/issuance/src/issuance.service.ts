@@ -30,7 +30,7 @@ import { io } from 'socket.io-client';
 import { IIssuedCredentialSearchParams, IssueCredentialType } from 'apps/api-gateway/src/issuance/interfaces';
 import { ICredentialOfferResponse, IDeletedIssuanceRecords, IIssuedCredential, IJsonldCredential, IPrettyVc, ISchemaObject } from '@credebl/common/interfaces/issuance.interface';
 import { OOBIssueCredentialDto } from 'apps/api-gateway/src/issuance/dtos/issuance.dto';
-import { RecordType, agent_invitations, organisation, user } from '@prisma/client';
+import { RecordType, agent_invitations, org_agents, organisation, user } from '@prisma/client';
 import { createOobJsonldIssuancePayload, validateAndUpdateIssuanceDates, validateEmail } from '@credebl/common/cast.helper';
 import { sendEmail } from '@credebl/common/send-grid-helper-file';
 import * as pLimit from 'p-limit';
@@ -563,9 +563,9 @@ export class IssuanceService {
     }
   }
 
-  async getIssueCredentialWebhook(payload: IssueCredentialWebhookPayload): Promise<object> {
+  async getIssueCredentialWebhook(payload: IssueCredentialWebhookPayload): Promise<org_agents> {
     try {
-      const agentDetails = await this.issuanceRepository.saveIssuedCredentialDetails(payload);
+      const agentDetails: org_agents = await this.issuanceRepository.saveIssuedCredentialDetails(payload);
       return agentDetails;
     } catch (error) {
       this.logger.error(`[getIssueCredentialsbyCredentialRecordId] - error in get credentials : ${JSON.stringify(error)}`);

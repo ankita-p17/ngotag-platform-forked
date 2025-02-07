@@ -454,7 +454,7 @@ export class CloudWalletService {
       const { tenantId } = getTenant;
       const { agentEndpoint } = baseWalletDetails;
 
-      const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_DID_LIST}${tenantId}`;
+      const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_DID_LIST}${tenantId}?isDefault=${walletDetails.isDefault}`;
 
       const didList = await this.commonService.httpGet(url, { headers: { authorization: decryptedApiKey } });
       return didList;

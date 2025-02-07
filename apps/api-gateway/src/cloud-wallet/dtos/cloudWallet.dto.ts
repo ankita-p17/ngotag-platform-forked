@@ -184,7 +184,13 @@ export class ReceiveInvitationUrlDTO {
     @IsOptional()
     @Transform(({ value }) => trim(value))
     @IsString({ message: 'endorser did must be in string format.' })
-    endorserDid?: string; 
+    endorserDid?: string;
+    
+    @ApiPropertyOptional({example: 'false'})
+    @IsOptional()
+    @Transform(({ value }) => trim(value))
+    @IsBoolean({ message: 'isDefault must be boolean value.' })
+    isDefault?: boolean = false;
 
     email?: string;
     

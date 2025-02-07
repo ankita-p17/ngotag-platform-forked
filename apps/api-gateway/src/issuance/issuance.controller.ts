@@ -720,18 +720,16 @@ if (id && 'default' === issueCredentialDto.contextCorrelationId) {
   issueCredentialDto.orgId = id;
 }
      
-      const getCredentialDetails = await this.issueCredentialService.getIssueCredentialWebhook(issueCredentialDto, id).catch(error => {
+      
+      const getAgentOrgDetail = await this.issueCredentialService.getIssueCredentialWebhook(issueCredentialDto, id).catch(error => {
         this.logger.debug(`error in saving issuance webhook ::: ${JSON.stringify(error)}`);
       });
       const finalResponse: IResponseType = {
         statusCode: HttpStatus.CREATED,
         message: ResponseMessages.issuance.success.create,
-        data: getCredentialDetails
+        data: getAgentOrgDetail
       };   
-      
-      const  webhookUrl = await this.issueCredentialService._getWebhookUrl(issueCredentialDto.contextCorrelationId, id).catch(error => {
-        this.logger.debug(`error in getting webhook url ::: ${JSON.stringify(error)}`);
-      });            
+      const  webhookUrl: string | false = getAgentOrgDetail ? getAgentOrgDetail.response.webhookUrl : false;
       if (webhookUrl) {
         const plainIssuanceDto = JSON.parse(JSON.stringify(issueCredentialDto));
 

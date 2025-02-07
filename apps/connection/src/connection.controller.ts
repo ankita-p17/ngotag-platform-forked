@@ -14,7 +14,8 @@ import {
 import { IConnectionList, IDeletedConnectionsRecord } from '@credebl/common/interfaces/connection.interface';
 import { IConnectionDetailsById } from 'apps/api-gateway/src/interfaces/IConnectionSearch.interface';
 import { IQuestionPayload } from './interfaces/messaging.interfaces';
-import { user } from '@prisma/client';
+// eslint-disable-next-line camelcase
+import { org_agents, user } from '@prisma/client';
 @Controller()
 export class ConnectionController {
   constructor(private readonly connectionService: ConnectionService) {}
@@ -25,7 +26,8 @@ export class ConnectionController {
    * @returns Callback URL for connection and created connections details
    */
   @MessagePattern({ cmd: 'webhook-get-connection' })
-  async getConnectionWebhook(payload: ICreateConnection): Promise<object> {
+  // eslint-disable-next-line camelcase
+  async getConnectionWebhook(payload: ICreateConnection): Promise<org_agents> {
     return this.connectionService.getConnectionWebhook(payload);
   }
 

@@ -2,6 +2,7 @@
 import { IAcceptOffer, ICreateCloudWallet, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, ICreateConnection, IConnectionInvitationResponse, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { Inject, Injectable} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { Prisma } from '@prisma/client';
 import { BaseService } from 'libs/service/base.service';
 
 @Injectable()
@@ -10,9 +11,20 @@ export class CloudWalletService extends BaseService {
     super('CloudWalletServiceProxy');
   }
 
-  configureBaseWallet(
+  async configureBaseWallet(
     cloudBaseWalletConfigure: ICloudBaseWalletConfigure
   ): Promise<IGetStoredWalletInfo> {
+    const orgAgentPayload: Prisma.org_agentsCreateInput = {
+      createdBy: cloudBaseWalletConfigure.orgId,
+      webhookUrl: cloudBaseWalletConfigure.webhookUrl,
+      lastChangedBy: cloudBaseWalletConfigure.orgId,
+      organisation: {
+        connect: {
+            id: cloudBaseWalletConfigure.orgId
+        }
+      }
+    };
+    await this.sendNatsMessage(this.cloudWalletServiceProxy, 'create-new-org-agent', orgAgentPayload);
     return this.sendNatsMessage(this.cloudWalletServiceProxy, 'configure-cloud-base-wallet', cloudBaseWalletConfigure);
   }
 

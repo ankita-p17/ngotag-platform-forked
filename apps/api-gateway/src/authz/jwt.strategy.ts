@@ -57,7 +57,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     let userDetails = null;
     let userInfo;
 
-    if (payload?.preferred_username) {
+    if (payload && !(payload.preferred_username.includes('service-account'))) {
       userInfo = await this.usersService.getUserByUserIdInKeycloak(payload?.preferred_username);
     }
     

@@ -1345,7 +1345,6 @@ export class UserService {
 
   async getUserByUserIdInKeycloak(email: string): Promise<string> {
     try {
-     
       const userData = await this.userRepository.checkUserExist(email.toLowerCase());
 
       if (!userData) {

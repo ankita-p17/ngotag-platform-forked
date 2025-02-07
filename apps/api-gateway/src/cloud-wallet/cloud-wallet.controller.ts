@@ -295,19 +295,21 @@ export class CloudWalletController {
         * @param res 
         * @returns DID list
     */
-   @Get('/did')
+   @Get('/did/:isDefault')
    @ApiOperation({ summary: 'Get DID list from wallet', description: 'Get DID list from wallet' })
    @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: ApiResponseDto })
    @UseGuards(AuthGuard('jwt'), UserRoleGuard)
    async getDidList(
        @Res() res: Response,
-       @User() user: user
+       @User() user: user,
+       @Param('isDefault') isDefault: boolean = false
    ): Promise<Response> {
        const { id, email } = user;
 
        const walletDetails: IWalletDetailsForDidList = {
            userId: id,
-           email
+           email,
+           isDefault
        };
 
        const didListDetails = await this.cloudWalletService.getDidList(walletDetails);

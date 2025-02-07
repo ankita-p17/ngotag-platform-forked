@@ -23,7 +23,7 @@ import {
   IStoreAgent,
   IAgentConfigure
 } from './interface/agent-service.interface';
-import { user } from '@prisma/client';
+import { Prisma, user } from '@prisma/client';
 import { InvitationMessage } from '@credebl/common/interfaces/agent-service.interface';
 import { AgentSpinUpStatus } from '@credebl/enum/enum';
 
@@ -87,6 +87,11 @@ export class AgentServiceController {
   @MessagePattern({ cmd: 'agent-create-credential-definition' })
   async createCredentialDefinition(payload: ITenantCredDef): Promise<object> {
     return this.agentServiceService.createCredentialDefinition(payload);
+  }
+
+  @MessagePattern({ cmd: 'create-new-org-agent' })
+  async createNewOrgAgent(payload:Prisma.org_agentsCreateInput): Promise<object> {
+    return this.agentServiceService.createNewOrgAgent(payload);
   }
 
   // DONE
