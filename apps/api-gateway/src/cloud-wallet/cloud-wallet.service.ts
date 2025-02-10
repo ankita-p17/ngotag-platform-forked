@@ -103,6 +103,12 @@ getCredentialByCredentialRecordId(
   return this.sendNatsMessage(this.cloudWalletServiceProxy, 'wallet-credential-by-record-id', credentialDetails);
 }
 
+getCredentialFormatDataByCredentialRecordId(
+  credentialDetails: ICredentialDetails
+): Promise<Response> {
+  return this.sendNatsMessage(this.cloudWalletServiceProxy, 'wallet-credentialFormatData-by-record-id', credentialDetails);
+}
+
 getBasicMessageByConnectionId(
   connectionDetails: IBasicMessage
 ): Promise<Response> {
