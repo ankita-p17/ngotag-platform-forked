@@ -549,7 +549,7 @@ export class CloudWalletService {
   /**
    * Get credential by record id
    * @param credentialDetails
-   * @returns Connection Details
+   * @returns credential Details
    */
   async getCredentialByRecord(credentialDetails: ICredentialDetails): Promise<Response> {
     try {
@@ -559,7 +559,7 @@ export class CloudWalletService {
       const {tenantId} = getTenant;
       const { agentEndpoint } = baseWalletDetails;
 
-      const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_CREDENTIAL}/${credentialRecordId}${tenantId}`;
+      const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_CREDENTIAL}/${credentialRecordId}/${tenantId}`;
 
       const credentialDetailResponse = await this.commonService.httpGet(url, { headers: { authorization: decryptedApiKey } });
       return credentialDetailResponse;
@@ -568,6 +568,29 @@ export class CloudWalletService {
       throw error;
     }
   }
+
+    /**
+   * Get credential by record id
+   * @param credentialDetails
+   * @returns credential Details
+   */
+    async getCredentialFormatDataByRecord(credentialDetails: ICredentialDetails): Promise<Response> {
+      try {
+        const { userId, credentialRecordId } = credentialDetails;
+        const [baseWalletDetails, getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
+       
+        const {tenantId} = getTenant;
+        const { agentEndpoint } = baseWalletDetails;
+  
+        const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_CREDENTIAL_FORMAT_DATA}/${credentialRecordId}/${tenantId}`;
+  
+        const credentialDetailResponse = await this.commonService.httpGet(url, { headers: { authorization: decryptedApiKey } });
+        return credentialDetailResponse;
+      } catch (error) {
+        await this.commonService.handleError(error);
+        throw error;
+      }
+    }
 
   /**
    * Get basic-message by connection id

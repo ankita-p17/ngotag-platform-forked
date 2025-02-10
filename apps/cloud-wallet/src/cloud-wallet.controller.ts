@@ -79,6 +79,11 @@ export class CloudWalletController {
     return this.cloudWalletService.getCredentialByRecord(credentialDetails);
   }
 
+  @MessagePattern({ cmd: 'wallet-credentialFormatData-by-record-id' })
+  async getCredentialFormatDataByCredentialRecordId(credentialDetails: ICredentialDetails): Promise<Response> {
+    return this.cloudWalletService.getCredentialFormatDataByRecord(credentialDetails);
+  }
+
   @MessagePattern({ cmd: 'basic-message-list-by-connection-id' })
   async getBasicMessageByConnectionId(connectionDetails: IBasicMessage): Promise<Response> {
     return this.cloudWalletService.getBasicMessageByConnectionId(connectionDetails);
