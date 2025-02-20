@@ -1,6 +1,6 @@
 import { IResponse } from '@credebl/common/interfaces/response.interface';
 import { ResponseMessages } from '@credebl/common/response-messages';
-import { Controller, Post, Logger, Body, HttpStatus, Res, UseFilters, UseGuards, Get, Param, Query, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Logger, Body, HttpStatus, Res, UseFilters, UseGuards, Get, Param, Query, BadRequestException, Delete } from '@nestjs/common';
 import { ApiBearerAuth, ApiForbiddenResponse, ApiOperation, ApiQuery, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { ForbiddenErrorDto } from '../dtos/forbidden-error.dto';
 import { UnauthorizedErrorDto } from '../dtos/unauthorized-error.dto';
@@ -501,6 +501,44 @@ export class CloudWalletController {
             };
             return res.status(HttpStatus.OK).json(finalResponse);
         }
+
+
+/**
+   * Delete credential by credential id
+   * @param credentialListQueryOptions
+   * @param res
+   * @returns deleted credential
+   */
+@Delete('/credential/:credentialRecordId')
+@ApiOperation({
+  summary: 'Get credential by credential record Id',
+  description: 'Get credential by credential record Id'
+})
+@ApiResponse({ status: HttpStatus.OK, description: 'Success', type: ApiResponseDto })
+@UseGuards(AuthGuard('jwt'), UserRoleGuard)
+async deleteCredentialByCredentialRecordId(
+  @Param('credentialRecordId') credentialRecordId: string,
+  @Res() res: Response,
+  @User() user: user
+): Promise<Response> {
+  const { id, email } = user;
+
+  const credentialDetails: ICredentialDetails = {
+    userId: id,
+    email,
+    credentialRecordId
+  };
+
+  const connectionDetailResponse = await this.cloudWalletService.deleteCredentialByCredentialRecordId(
+    credentialDetails
+  );
+  const finalResponse: IResponse = {
+    statusCode: HttpStatus.OK,
+    message: ResponseMessages.cloudWallet.success.deleteCredential,
+    data: connectionDetailResponse
+  };
+  return res.status(HttpStatus.OK).json(finalResponse);
+}
 
     /**
         * Get basic-message by connection id

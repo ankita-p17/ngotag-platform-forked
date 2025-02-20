@@ -41,6 +41,8 @@ import { CloudWalletRepository } from './cloud-wallet.repository';
 import { ResponseMessages } from '@credebl/common/response-messages';
 import { CloudWalletType } from '@credebl/enum/enum';
 import { CommonConstants } from '@credebl/common/common.constant';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const md5 = require('md5');
 
 @Injectable()
 export class CloudWalletService {
@@ -453,10 +455,10 @@ export class CloudWalletService {
 
       const { tenantId } = getTenant;
       const { agentEndpoint } = baseWalletDetails;
-
       const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_DID_LIST}${tenantId}?isDefault=${walletDetails.isDefault}`;
 
       const didList = await this.commonService.httpGet(url, { headers: { authorization: decryptedApiKey } });
+      didList['hashTenantID'] = md5(tenantId);
       return didList;
     } catch (error) {
       await this.commonService.handleError(error);
@@ -591,6 +593,30 @@ export class CloudWalletService {
         throw error;
       }
     }
+
+
+        /**
+   * Get credential by record id
+   * @param credentialDetails
+   * @returns credential Details
+   */
+        async deleteCredentialByRecord(credentialDetails: ICredentialDetails): Promise<Response> {
+          try {
+            const { userId, credentialRecordId } = credentialDetails;
+            const [baseWalletDetails, getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
+           
+            const {tenantId} = getTenant;
+            const { agentEndpoint } = baseWalletDetails;
+      
+            const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_DELETE_CREDENTIAL}/${credentialRecordId}/${tenantId}`;
+      
+            const credentialDetailResponse = await this.commonService.httpGet(url, { headers: { authorization: decryptedApiKey } });
+            return credentialDetailResponse;
+          } catch (error) {
+            await this.commonService.handleError(error);
+            throw error;
+          }
+        }
 
   /**
    * Get basic-message by connection id
