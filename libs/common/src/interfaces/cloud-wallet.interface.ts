@@ -151,8 +151,8 @@ export interface ICloudBaseWalletConfigure {
   agentEndpoint: string;
   userId: string;
   email: string;
-  webhookUrl: string;
-  orgId: string;
+  // webhookUrl: string;
+  // orgId: string;
 }
 
 export interface Tags {

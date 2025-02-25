@@ -1,8 +1,8 @@
-import { IsNotEmpty, IsString, IsUrl } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
 import { ApiProperty } from '@nestjs/swagger';
-import { IsHostPortOrDomain, trim } from '@credebl/common/cast.helper';
-import { Transform } from 'class-transformer';
+import { IsHostPortOrDomain } from '@credebl/common/cast.helper';
+// import { Transform } from 'class-transformer';
 
 export class CloudBaseWalletConfigureDto {
   @ApiProperty({ example: 'xxx-xxxx-xxxx' })
@@ -21,17 +21,17 @@ export class CloudBaseWalletConfigureDto {
   @IsHostPortOrDomain({ message: 'Agent Endpoint must be a valid protocol://host:port or domain'})
   agentEndpoint: string;
 
-  @ApiProperty({ example: '5edee49e-17f1-4b54-9070-ef00789777d4' })
-  @IsString({ message: 'orgId must be a string' })
-  @IsNotEmpty({ message: 'please provide valid orgId' })
-  orgId: string;
+  // @ApiProperty({ example: '5edee49e-17f1-4b54-9070-ef00789777d4' })
+  // @IsString({ message: 'orgId must be a string' })
+  // @IsNotEmpty({ message: 'please provide valid orgId' })
+  // orgId: string;
   
-  @ApiProperty()
-  @Transform(({ value }) => trim(value))
-  @IsNotEmpty({ message: 'webhookUrl is required.' })
-  @IsString({ message: 'webhookUrl must be in string format.' })
-  @IsUrl(undefined, {message:'webhookUrl is not valid'})
-  webhookUrl: string;
+  // @ApiProperty()
+  // @Transform(({ value }) => trim(value))
+  // @IsNotEmpty({ message: 'webhookUrl is required.' })
+  // @IsString({ message: 'webhookUrl must be in string format.' })
+  // @IsUrl(undefined, {message:'webhookUrl is not valid'})
+  // webhookUrl: string;
 
   userId: string;
 
