@@ -610,7 +610,7 @@ export class CloudWalletService {
       
             const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_DELETE_CREDENTIAL}/${credentialRecordId}/${tenantId}`;
       
-            const credentialDetailResponse = await this.commonService.httpGet(url, { headers: { authorization: decryptedApiKey } });
+            const credentialDetailResponse = await this.commonService.httpDelete(url, { headers: { authorization: decryptedApiKey } });
             return credentialDetailResponse;
           } catch (error) {
             await this.commonService.handleError(error);
