@@ -292,55 +292,53 @@ export class VerificationController {
         return res.status(HttpStatus.CREATED).json(finalResponse);
     }
 
-    /**
-     * 
-     * @param orgId 
-     * @returns Proof presentation details
-     */
-    @Post('wh/:orgId/proofs')
-    @ApiOperation({
-        summary: `Receive webhook proof presentation`,
-        description: `Handle proof presentations for a specified organization via a webhook`
-    })
-    @ApiExcludeEndpoint()
-    @ApiResponse({ status: HttpStatus.CREATED, description: 'Created', type: ApiResponseDto })
-    @ApiUnauthorizedResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized', type: UnauthorizedErrorDto })
-    @ApiForbiddenResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden', type: ForbiddenErrorDto })
-    async webhookProofPresentation(
-        @Param('orgId') orgId: string,
-        @Body() proofPresentationPayload: WebhookPresentationProofDto,
-        @Res() res: Response
-    ): Promise<Response> {
-        proofPresentationPayload.type = 'Verification';
-       
-        if (orgId && 'default' === proofPresentationPayload.contextCorrelationId) {
-            proofPresentationPayload.orgId = orgId;
-          }
-          
-            const webhookProofPresentation = await this.verificationService.webhookProofPresentation(orgId, proofPresentationPayload).catch(error => {
-                this.logger.debug(`error in saving verification webhook ::: ${JSON.stringify(error)}`);
-            });
-            const finalResponse: IResponse = {
-                statusCode: HttpStatus.CREATED,
-                message: ResponseMessages.verification.success.create,
-                data: webhookProofPresentation
-            };
-           
-           
-             const webhookUrl = await this.verificationService._getWebhookUrl(proofPresentationPayload?.contextCorrelationId, orgId).catch(error => {
-                this.logger.debug(`error in getting webhook url ::: ${JSON.stringify(error)}`);
-             });
-            
-        if (webhookUrl) {
-            
-                await this.verificationService._postWebhookResponse(webhookUrl, {data:proofPresentationPayload}).catch(error => {
-                    this.logger.debug(`error in posting webhook  response to webhook url ::: ${JSON.stringify(error)}`);
-                });
-             
-        }
-        return res.status(HttpStatus.CREATED).json(finalResponse);
+  /**
+   *
+   * @param orgId
+   * @returns Proof presentation details
+   */
+  @Post('wh/:orgId/proofs')
+  @ApiOperation({
+    summary: `Receive webhook proof presentation`,
+    description: `Handle proof presentations for a specified organization via a webhook`
+  })
+  @ApiExcludeEndpoint()
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Created', type: ApiResponseDto })
+  @ApiUnauthorizedResponse({ status: HttpStatus.UNAUTHORIZED, description: 'Unauthorized', type: UnauthorizedErrorDto })
+  @ApiForbiddenResponse({ status: HttpStatus.FORBIDDEN, description: 'Forbidden', type: ForbiddenErrorDto })
+  async webhookProofPresentation(
+    @Param('orgId') orgId: string,
+    @Body() proofPresentationPayload: WebhookPresentationProofDto,
+    @Res() res: Response
+  ): Promise<Response> {
+    proofPresentationPayload.type = 'Verification';
 
-}
+    if (orgId && 'default' === proofPresentationPayload.contextCorrelationId) {
+      proofPresentationPayload.orgId = orgId;
+    }
+
+    const webhookProofPresentation = await this.verificationService
+      .webhookProofPresentation(orgId, proofPresentationPayload)
+      .catch((error) => {
+        this.logger.error(`error in saving verification webhook ::: ${JSON.stringify(error)}`);
+      });
+    const finalResponse: IResponse = {
+      statusCode: HttpStatus.CREATED,
+      message: ResponseMessages.verification.success.create,
+      data: webhookProofPresentation
+    };
+
+    const webhookUrl: string | false = webhookProofPresentation ? webhookProofPresentation.webhookUrl : false;
+
+    if (webhookUrl) {
+      await this.verificationService
+        ._postWebhookResponse(webhookUrl, { data: proofPresentationPayload })
+        .catch((error) => {
+          this.logger.debug(`error in posting webhook  response to webhook url ::: ${JSON.stringify(error)}`);
+        });
+    }
+    return res.status(HttpStatus.CREATED).json(finalResponse);
+  }
 
 @Delete('/orgs/:orgId/verification-records')
 @ApiOperation({ summary: 'Delete verification record', description: 'Delete verification records by orgId' })

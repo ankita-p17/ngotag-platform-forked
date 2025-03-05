@@ -2,7 +2,7 @@ import { ResponseMessages } from '@credebl/common/response-messages';
 import { PrismaService } from '@credebl/prisma-service';
 import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 // eslint-disable-next-line camelcase
-import { agent_invitations, org_agents, organisation, platform_config, presentations } from '@prisma/client';
+import { agent_invitations, org_agents, organisation, platform_config } from '@prisma/client';
 import { IProofPresentation, IProofRequestSearchCriteria } from '../interfaces/verification.interface';
 import { IUserRequest } from '@credebl/user-request/user-request.interface';
 import { IProofPresentationsListCount, IVerificationRecords } from '@credebl/common/interfaces/verification.interface';
@@ -122,10 +122,13 @@ export class VerificationRepository {
     }
   }
 
-  async storeProofPresentation(payload: IProofPresentation): Promise<presentations> {
+  // eslint-disable-next-line camelcase
+  async storeProofPresentation(payload: IProofPresentation): Promise<org_agents> {
     try {
       let encryptEmailId;
       let organisationId: string;
+      // eslint-disable-next-line camelcase
+      let agentOrg: org_agents;
       let schemaId;
 
       const { proofPresentationPayload, orgId } = payload;
@@ -145,13 +148,19 @@ export class VerificationRepository {
       }
 
       if ('default' !== proofPresentationPayload?.contextCorrelationId) {
-        const getOrganizationId = await this.getOrganizationByTenantId(proofPresentationPayload?.contextCorrelationId);
-        organisationId = getOrganizationId?.orgId;
+        agentOrg = await this.getOrganizationByTenantId(proofPresentationPayload?.contextCorrelationId);
+        organisationId = agentOrg?.orgId;
+        if (agentOrg?.orgId) {
+          organisationId = agentOrg?.orgId;
+        } else {
+          agentOrg = await this.getOrganizationByOrgId(orgId);
+          organisationId = orgId;
+        }
       } else {
+        agentOrg = await this.getOrganizationByOrgId(orgId);
         organisationId = orgId;
       }
-      
-      const proofPresentationsDetails = await this.prisma.presentations.upsert({
+      await this.prisma.presentations.upsert({
         where: {
           threadId: proofPresentationPayload?.threadId
         },
@@ -176,7 +185,7 @@ export class VerificationRepository {
           emailId: encryptEmailId
         }
       });
-      return proofPresentationsDetails;
+      return agentOrg;
     } catch (error) {
       this.logger.error(`Error in get saveProofPresentationDetails: ${error.message} `);
       throw error;
@@ -206,6 +215,20 @@ export class VerificationRepository {
       return this.prisma.organisation.findFirst({ where: { id: orgId } });
     } catch (error) {
       this.logger.error(`[getOrganization] - error: ${JSON.stringify(error)}`);
+      throw error;
+    }
+  }
+
+  // eslint-disable-next-line camelcase
+  async getOrganizationByOrgId(orgId: string): Promise<org_agents> {
+    try {
+      return this.prisma.org_agents.findFirst({
+        where: {
+          orgId
+        }
+      });
+    } catch (error) {
+      this.logger.error(`Error in getOrganization in issuance repository: ${error.message} `);
       throw error;
     }
   }

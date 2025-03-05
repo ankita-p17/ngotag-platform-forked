@@ -188,7 +188,6 @@ export class ReceiveInvitationUrlDTO {
     
     @ApiPropertyOptional({example: 'false'})
     @IsOptional()
-    @Transform(({ value }) => trim(value))
     @IsBoolean({ message: 'isDefault must be boolean value.' })
     isDefault?: boolean = false;
 
