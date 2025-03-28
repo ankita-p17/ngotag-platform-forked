@@ -2,7 +2,7 @@
 import { Controller } from '@nestjs/common'; // Import the common service in the library
 import { CloudWalletService } from './cloud-wallet.service'; // Import the common service in connection module
 import { MessagePattern } from '@nestjs/microservices'; // Import the nestjs microservices package
-import { IAcceptOffer, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, ICreateCloudWallet, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, ICreateConnection, IConnectionInvitationResponse, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails } from '@credebl/common/interfaces/cloud-wallet.interface';
+import { IAcceptOffer, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, ICreateCloudWallet, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, ICreateConnection, IConnectionInvitationResponse, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred } from '@credebl/common/interfaces/cloud-wallet.interface';
 
 @Controller()
 export class CloudWalletController {
@@ -26,6 +26,16 @@ export class CloudWalletController {
   @MessagePattern({ cmd: 'get-proof-by-proof-id-holder' })
   async getProofById(proofPrsentationByIdPayload: IGetProofPresentationById): Promise<IProofRequestRes> {
     return this.cloudWalletService.getProofById(proofPrsentationByIdPayload);
+  }
+
+  @MessagePattern({ cmd: 'submit-proof-with-cred' })
+  async submitProofWithCred(proofPresentationByIdPayload: IProofPresentationPayloadWithCred): Promise<IProofRequestRes> {
+    return this.cloudWalletService.submitProofWithCred(proofPresentationByIdPayload);
+  }
+
+  @MessagePattern({ cmd: 'get-credentials-for-request' })
+  async getCredentialsForRequest(proofPrsentationByIdPayload: IGetCredentialsForRequest): Promise<ICredentialForRequestRes> {
+    return this.cloudWalletService.getCredentialsByProofId(proofPrsentationByIdPayload);
   }
 
   @MessagePattern({ cmd: 'get-proof-presentation-holder' })
@@ -80,9 +90,16 @@ export class CloudWalletController {
   }
 
   @MessagePattern({ cmd: 'wallet-credentialFormatData-by-record-id' })
-  async getCredentialFormatDataByCredentialRecordId(credentialDetails: ICredentialDetails): Promise<Response> {
-    return this.cloudWalletService.getCredentialFormatDataByRecord(credentialDetails);
+  async getCredentialFormatDataByCredentialRecordId(proofDetails: ICredentialDetails): Promise<Response> {
+    return this.cloudWalletService.getCredentialFormatDataByRecord(proofDetails);
   }
+  
+  @MessagePattern({ cmd: 'wallet-Proof-presentation-FormatData-by-record-id' })
+  async getProofPresentationFormatDataByCredentialRecordId(credentialDetails: IProofPresentationDetails): Promise<Response> {
+    return this.cloudWalletService.getProofFormDataByRecord(credentialDetails);
+  }
+
+
   @MessagePattern({ cmd: 'delete-credential-by-record-id' })
   async deleteCredentialByCredentialRecordId(credentialDetails: ICredentialDetails): Promise<Response> {
     return this.cloudWalletService.deleteCredentialByRecord(credentialDetails);

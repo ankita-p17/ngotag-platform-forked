@@ -312,7 +312,6 @@ export class VerificationController {
     @Res() res: Response
   ): Promise<Response> {
     proofPresentationPayload.type = 'Verification';
-
     if (orgId && 'default' === proofPresentationPayload.contextCorrelationId) {
       proofPresentationPayload.orgId = orgId;
     }

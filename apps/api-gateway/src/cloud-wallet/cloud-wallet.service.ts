@@ -1,5 +1,5 @@
 
-import { IAcceptOffer, ICreateCloudWallet, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, ICreateConnection, IConnectionInvitationResponse, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails } from '@credebl/common/interfaces/cloud-wallet.interface';
+import { IAcceptOffer, ICreateCloudWallet, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, ICreateConnection, IConnectionInvitationResponse, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { Inject, Injectable} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 // import { Prisma } from '@prisma/client';
@@ -46,6 +46,16 @@ export class CloudWalletService extends BaseService {
     return this.sendNatsMessage(this.cloudWalletServiceProxy, 'get-proof-by-proof-id-holder', proofPresentationByIdPayload);
   }
 
+  submitProofWithCred(
+    proofPresentationByIdPayload: IProofPresentationPayloadWithCred
+  ): Promise<IProofRequestRes> {
+    return this.sendNatsMessage(this.cloudWalletServiceProxy, 'submit-proof-with-cred', proofPresentationByIdPayload);
+  }
+  getCredentialsForRequest(
+    proofPresentationByIdPayload: IGetCredentialsForRequest
+  ): Promise<ICredentialForRequestRes> {
+    return this.sendNatsMessage(this.cloudWalletServiceProxy, 'get-credentials-for-request', proofPresentationByIdPayload);
+  }
   getProofPresentation(
     proofPresentationPayload: IGetProofPresentation
   ): Promise<IProofRequestRes[]> {
@@ -107,6 +117,12 @@ getCredentialFormatDataByCredentialRecordId(
   credentialDetails: ICredentialDetails
 ): Promise<Response> {
   return this.sendNatsMessage(this.cloudWalletServiceProxy, 'wallet-credentialFormatData-by-record-id', credentialDetails);
+}
+
+getProofFormatDataByProofRecordId(
+  credentialDetails: IProofPresentationDetails
+): Promise<Response> {
+  return this.sendNatsMessage(this.cloudWalletServiceProxy, 'wallet-Proof-presentation-FormatData-by-record-id', credentialDetails);
 }
 
 deleteCredentialByCredentialRecordId(

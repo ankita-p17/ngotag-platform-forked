@@ -3,13 +3,14 @@ import { CommonService } from '@credebl/common';
 import {
   BadRequestException,
   ConflictException,
+  HttpStatus,
   Inject,
   Injectable,
   InternalServerErrorException,
   Logger,
   NotFoundException
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { Cache } from 'cache-manager';
 import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import {
@@ -35,7 +36,11 @@ import {
   IConnectionInvitationResponse,
   GetAllCloudWalletConnections,
   IBasicMessage,
-  IBasicMessageDetails
+  IBasicMessageDetails,
+  IProofPresentationDetails,
+  IGetCredentialsForRequest,
+  ICredentialForRequestRes,
+  IProofPresentationPayloadWithCred
 } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { CloudWalletRepository } from './cloud-wallet.repository';
 import { ResponseMessages } from '@credebl/common/response-messages';
@@ -178,6 +183,56 @@ export class CloudWalletService {
       throw error;
     }
   }
+
+    /**
+   * Get proof presentation by proof Id
+   * @param proofPrsentationByIdPayload
+   * @returns proof presentation
+   */
+    async submitProofWithCred(proofPresentationByIdPayload: IProofPresentationPayloadWithCred): Promise<IProofRequestRes> {
+      try {
+        const { proof, userId } = proofPresentationByIdPayload;
+        const [baseWalletDetails, getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
+  
+        const { tenantId } = getTenant;
+        const { agentEndpoint } = baseWalletDetails;
+  
+        const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_POST_PROOF_REQUEST_WITH_CRED}/${tenantId}`;
+  
+        const submitProofWithCred = await this.commonService.httpPost(url, proof, { headers: { authorization: decryptedApiKey } });
+        return submitProofWithCred;
+      } catch (error) {
+        await this.commonService.handleError(error);
+        throw error;
+      }
+    }
+
+    /**
+   * Get Credentials by proof Id
+   * @param proofPrsentationByIdPayload
+   * @returns proof presentation
+   */
+    async getCredentialsByProofId(proofPrsentationByIdPayload: IGetCredentialsForRequest): Promise<ICredentialForRequestRes> {
+      try {
+        const { proofRecordId, userId } = proofPrsentationByIdPayload;
+        const [baseWalletDetails, getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
+  
+        const { tenantId } = getTenant;
+        const { agentEndpoint } = baseWalletDetails;
+  
+        const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_GET_CREDENTIALS_BY_PROOF_REQUEST}/${tenantId}/${proofRecordId}`;
+  
+        const getProofById = await this.commonService.httpGet(url, { headers: { authorization: decryptedApiKey } });
+        return getProofById;
+      } catch (error) {
+        if (error.response?.error?.message?.includes('Proof record is in invalid state')) {
+          throw new RpcException({message:error.response.error.message, statusCode:  HttpStatus.BAD_REQUEST});
+        }
+        await this.commonService.handleError(error);
+        
+        throw error;
+      }
+    }
 
   /**
    * Get proof presentation
@@ -593,6 +648,29 @@ export class CloudWalletService {
         throw error;
       }
     }
+
+       /**
+   * Get credential by record id
+   * @param proofDetails
+   * @returns credential Details
+   */
+       async getProofFormDataByRecord(proofDetails: IProofPresentationDetails): Promise<Response> {
+        try {
+          const { userId, proofRecordId } = proofDetails;
+          const [baseWalletDetails, getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
+         
+          const {tenantId} = getTenant;
+          const { agentEndpoint } = baseWalletDetails;
+    
+          const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_PROOF_FORM_DATA}/${tenantId}/${proofRecordId}`;
+    
+          const credentialDetailResponse = await this.commonService.httpGet(url, { headers: { authorization: decryptedApiKey } });
+          return credentialDetailResponse;
+        } catch (error) {
+          await this.commonService.handleError(error);
+          throw error;
+        }
+      }
 
 
         /**

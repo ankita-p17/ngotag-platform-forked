@@ -139,6 +139,26 @@ export interface IGetProofPresentationById {
   proofRecordId: string;
 }
 
+export interface IProofPresentationPayloadWithCred {
+  userId: string;
+  email: string;
+  proof: {
+    proofFormats: {
+      presentationExchange: {
+        credentials: Record<string, string>;
+      }
+    },
+    comment?: string,
+    proofRecordId: string;
+  } 
+}
+
+export interface IGetCredentialsForRequest {
+  userId: string;
+  email: string;
+  proofRecordId: string;
+}
+
 export interface IGetProofPresentation {
   userId: string;
   email: string;
@@ -216,6 +236,12 @@ export interface ICredentialDetails {
   userId: string;
   email: string;
   credentialRecordId: string;
+}
+
+export interface IProofPresentationDetails {
+  userId: string;
+  email: string;
+  proofRecordId: string;
 }
 export interface Thread {
   pthid: string;
@@ -334,3 +360,79 @@ export interface IBasicMessageDetails {
   content: string;
   connectionId: string
 }
+
+
+export interface ICredentialForRequestRes {
+  proofFormats: ProofFormats;
+}
+
+interface ProofFormats {
+  presentationExchange: PresentationExchange;
+}
+
+interface PresentationExchange {
+  requirements:             Requirement[];
+  areRequirementsSatisfied: boolean;
+  name:                     string;
+  purpose:                  string;
+}
+
+interface Requirement {
+  rule:                   string;
+  needsCount:             number;
+  submissionEntry:        SubmissionEntry[];
+  isRequirementSatisfied: boolean;
+}
+
+interface SubmissionEntry {
+  inputDescriptorId:     string;
+  verifiableCredentials: VerifiableCredential[];
+}
+
+interface VerifiableCredential {
+  type:             object;
+  credentialRecord: CredentialRecord;
+}
+
+interface CredentialRecord {
+  _tags:      ITags;
+  metadata:   object;
+  id:         string;
+  createdAt:  Date;
+  credential: Credential;
+  updatedAt:  Date;
+}
+
+interface ITags {
+  claimFormat:   object;
+  contexts:      string[];
+  expandedTypes: string[];
+  issuerId:      string;
+  proofTypes:    string[];
+  subjectIds:    string[];
+  types:         string[];
+}
+
+
+interface Credential {
+  '@context':        string[];
+  type:              string[];
+  issuer:            Issuer;
+  issuanceDate:      Date;
+  credentialSubject: object;
+  proof:             Proof;
+}
+
+
+interface Issuer {
+  id: string;
+}
+
+interface Proof {
+  verificationMethod: string;
+  type:               string;
+  created:            Date;
+  proofPurpose:       string;
+  jws:                string;
+}
+

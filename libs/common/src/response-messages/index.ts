@@ -529,11 +529,13 @@ export const ResponseMessages = {
       createConnection: 'Connection created successfully.',
       basicMessage: 'Basic message send successfully',
       getProofById: 'Proof presentation has been successfully received.',
+      getCredentialsByProofId: 'Credentials fetch by proof request id',
       getProofPresentation: 'Proof presentations has been successfully received.',
       didList: 'DID list fetched sucessfully',
       connectionById: 'Connection record fetched successfully',
       credentials: 'Credentials fetched successfully',
       credentialByRecordId: 'Credential fetched successfully',
+      proofPresentationByRecordId: 'Proof presentation fetched successfully',
       deleteCredential: 'Credential deleted successfully',
       connectionList: 'Connection list fetched successfully',
       basicMessageByConnectionId: 'Basic message fetched successfully'
