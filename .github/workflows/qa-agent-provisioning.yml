@@ -1,4 +1,4 @@
-name: Build and deploy AGENT_PROVISIONING  app to QA ECS 
+name: Build and deploy AGENT_PROVISIONING app to QA ECS
 
 on:
   push:
@@ -19,6 +19,31 @@ jobs:
       contents: read
 
     steps:
+      - name: Check if tag creator is allowed
+        id: check-user
+        run: |
+          ALLOWED_USERS=("Chimi1999" "dev-dungana")
+          echo "Tag pushed by: ${{ github.actor }}"
+          is_allowed="false"
+          for user in "${ALLOWED_USERS[@]}"; do
+            if [[ "${{ github.actor }}" == "$user" ]]; then
+              is_allowed="true"
+              break
+            fi
+          done
+          echo "is_allowed=$is_allowed" >> $GITHUB_OUTPUT
+
+      - name: Delete tag if unauthorized
+        if: steps.check-user.outputs.is_allowed != 'true'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG_NAME=${GITHUB_REF#refs/tags/}
+          echo "Unauthorized tag push detected by ${{ github.actor }}. Deleting tag: $TAG_NAME"
+          curl -X DELETE -H "Authorization: token $GITHUB_TOKEN" \
+            https://api.github.com/repos/${{ github.repository }}/git/refs/tags/$TAG_NAME
+          exit 1
+
       - name: Checkout Repository
         uses: actions/checkout@v2
 
@@ -65,6 +90,7 @@ jobs:
       - name: Replace executionRoleArn in task definition
         run: |
           sed -i "s#\"executionRoleArn\": \"arn:aws:iam::.*:role/ecsTaskExecutionRole\"#\"executionRoleArn\": \"arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/ecsTaskExecutionRole\"#" qa-taskdef/agent-provisioning.json
+
       - name: Update Task Definition
         run: |
          FAMILY=$(sed -n 's/.*"family": "\(.*\)",/\1/p' qa-taskdef/agent-provisioning.json)
@@ -74,7 +100,7 @@ jobs:
 
          # Replace placeholders in the JSON file
          sed -e "s;%BUILD_NUMBER%;${{ github.run_number }};g" -e "s;%REPOSITORY_URI%;${REPOSITORY_URI};g" qa-taskdef/agent-provisioning.json > ${GITHUB_WORKSPACE}/${NAME}-v_${{ github.run_number }}.json
- 
+         
          # Debug: Print the content of the modified JSON file
          cat ${GITHUB_WORKSPACE}/${NAME}-v_${{ github.run_number }}.json
 
@@ -89,7 +115,7 @@ jobs:
           
           # Replace placeholders in the JSON file
           sed -e "s;%BUILD_NUMBER%;${{ github.run_number }};g" -e "s;%REPOSITORY_URI%;${REPOSITORY_URI};g" qa-taskdef/user-service.json > ${GITHUB_WORKSPACE}/${NAME}-v_${{ github.run_number }}.json
- 
+         
           # Debug: Print the content of the modified JSON file
           cat ${GITHUB_WORKSPACE}/${NAME}-v_${{ github.run_number }}.json
 
