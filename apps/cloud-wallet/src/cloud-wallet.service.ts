@@ -40,7 +40,8 @@ import {
   IProofPresentationDetails,
   IGetCredentialsForRequest,
   ICredentialForRequestRes,
-  IProofPresentationPayloadWithCred
+  IProofPresentationPayloadWithCred,
+  IDeclineProofRequest
 } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { CloudWalletRepository } from './cloud-wallet.repository';
 import { ResponseMessages } from '@credebl/common/response-messages';
@@ -155,6 +156,36 @@ export class CloudWalletService {
         headers: { authorization: decryptedApiKey }
       });
       return acceptProofRequest;
+    } catch (error) {
+      await this.commonService.handleError(error);
+      throw error;
+    }
+  }
+
+  /**
+   * Decline proof request
+   * @param declineProofRequest
+   * @returns proof presentation
+   */
+  async declineProofRequest(declineProofRequest: IDeclineProofRequest): Promise<IProofRequestRes> {
+    const { proofRecordId, sendProblemReport, problemReportDescription, userId } =
+      declineProofRequest;
+    try {
+      const [baseWalletDetails, getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
+
+      const { tenantId } = getTenant;
+      const { agentEndpoint } = baseWalletDetails;
+
+      const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_GET_PROOF_REQUEST}/${proofRecordId}${CommonConstants.CLOUD_WALLET_DECLINE_PROOF_REQUEST}${tenantId}`;
+      const proofAcceptRequestPayload = {
+        sendProblemReport,
+        problemReportDescription
+      };
+
+      const declineProofRequest = await this.commonService.httpPost(url, proofAcceptRequestPayload, {
+        headers: { authorization: decryptedApiKey }
+      });
+      return declineProofRequest;
     } catch (error) {
       await this.commonService.handleError(error);
       throw error;

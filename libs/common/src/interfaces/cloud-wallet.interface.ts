@@ -118,6 +118,13 @@ export interface IAcceptProofRequest {
   comment?: string;
 }
 
+export interface IDeclineProofRequest {
+  proofRecordId: string;
+  userId: string;
+  email: string;
+  sendProblemReport?: boolean;
+  problemReportDescription?: string;
+}
 export interface IAcceptProofRequestPayload {
   acceptProofRequest: IAcceptProofRequest;
   userId: string;

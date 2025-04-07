@@ -21,6 +21,7 @@ import { AcceptProofRequestDto } from './dtos/accept-proof-request.dto';
 import { IBasicMessage, IConnectionDetailsById, ICredentialDetails, IGetCredentialsForRequest, IGetProofPresentation, IGetProofPresentationById, IProofPresentationPayloadWithCred, IProofPresentationDetails, IWalletDetailsForDidList } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { CreateConnectionDto } from './dtos/create-connection.dto';
 import { ProofWithCredDto } from './dtos/accept-proof-request-with-cred.dto';
+import { DeclineProofRequestDto } from './dtos/decline-proof-request.dto';
 
 
 @UseFilters(CustomExceptionFilter)
@@ -118,6 +119,33 @@ export class CloudWalletController {
         const finalResponse: IResponse = {
             statusCode: HttpStatus.CREATED,
             message: ResponseMessages.cloudWallet.success.acceptProofRequest,
+            data: acceptProofRequestDetails
+        };
+        return res.status(HttpStatus.CREATED).json(finalResponse);
+    }
+
+    /**
+        * Accept proof request 
+        * @param acceptProofRequest
+        * @returns sucess message
+    */
+    @Post('/proofs/decline-request')
+    @ApiOperation({ summary: 'Accept proof request', description: 'Accept proof request' })
+    @ApiResponse({ status: HttpStatus.CREATED, description: 'Created', type: ApiResponseDto })
+    @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+    async declineProofRequest(
+        @Res() res: Response,
+        @Body() declineProofRequest: DeclineProofRequestDto,
+        @User() user: user
+    ): Promise<Response> {
+        const { id, email } = user;
+        declineProofRequest.userId = id;
+        declineProofRequest.email = email;
+
+        const acceptProofRequestDetails = await this.cloudWalletService.declineProofRequest(declineProofRequest);
+        const finalResponse: IResponse = {
+            statusCode: HttpStatus.CREATED,
+            message: ResponseMessages.cloudWallet.success.declineProofRequest,
             data: acceptProofRequestDetails
         };
         return res.status(HttpStatus.CREATED).json(finalResponse);

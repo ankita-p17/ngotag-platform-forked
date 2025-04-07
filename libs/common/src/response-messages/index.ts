@@ -526,6 +526,7 @@ export const ResponseMessages = {
       receive:'Received invitation successfully',
       configureBaseWallet: 'Successfully configure the base wallet.',
       acceptProofRequest: 'Proof request has been successfully accepted.',
+      declineProofRequest: 'Proof request has been successfully declined.',
       createConnection: 'Connection created successfully.',
       basicMessage: 'Basic message send successfully',
       getProofById: 'Proof presentation has been successfully received.',

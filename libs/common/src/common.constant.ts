@@ -337,6 +337,7 @@ CLOUD_WALLET_POST_PROOF_REQUEST_WITH_CRED = '/multi-tenancy/proofs/accept-reques
 CLOUD_WALLET_GET_CREDENTIALS_BY_PROOF_REQUEST = '/multi-tenancy/credentialsForRequest',
 CLOUD_WALLET_CREATE_CONNECTION_INVITATION = '/multi-tenancy/create-invitation',
 CLOUD_WALLET_ACCEPT_PROOF_REQUEST = '/accept-request/',
+CLOUD_WALLET_DECLINE_PROOF_REQUEST = '/decline-request/',
 CLOUD_WALLET_DID_LIST = '/multi-tenancy/dids/',
 CLOUD_WALLET_CONNECTION_BY_ID = '/multi-tenancy/connections/',
 CLOUD_WALLET_CREDENTIAL = '/multi-tenancy/credentials',

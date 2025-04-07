@@ -1,5 +1,5 @@
 
-import { IAcceptOffer, ICreateCloudWallet, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, ICreateConnection, IConnectionInvitationResponse, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred } from '@credebl/common/interfaces/cloud-wallet.interface';
+import { IAcceptOffer, ICreateCloudWallet, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, ICreateConnection, IConnectionInvitationResponse, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { Inject, Injectable} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 // import { Prisma } from '@prisma/client';
@@ -38,6 +38,12 @@ export class CloudWalletService extends BaseService {
     acceptProofRequest: IAcceptProofRequest
   ): Promise<IProofRequestRes> {
     return this.sendNatsMessage(this.cloudWalletServiceProxy, 'accept-proof-request-by-holder', acceptProofRequest);
+  }
+
+  declineProofRequest(
+    acceptProofRequest: IDeclineProofRequest
+  ): Promise<IProofRequestRes> {
+    return this.sendNatsMessage(this.cloudWalletServiceProxy, 'decline-proof-request-by-holder', acceptProofRequest);
   }
 
   getProofById(

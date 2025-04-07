@@ -2,7 +2,7 @@
 import { Controller } from '@nestjs/common'; // Import the common service in the library
 import { CloudWalletService } from './cloud-wallet.service'; // Import the common service in connection module
 import { MessagePattern } from '@nestjs/microservices'; // Import the nestjs microservices package
-import { IAcceptOffer, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, ICreateCloudWallet, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, ICreateConnection, IConnectionInvitationResponse, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred } from '@credebl/common/interfaces/cloud-wallet.interface';
+import { IAcceptOffer, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, ICreateCloudWallet, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, ICreateConnection, IConnectionInvitationResponse, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest } from '@credebl/common/interfaces/cloud-wallet.interface';
 
 @Controller()
 export class CloudWalletController {
@@ -21,6 +21,11 @@ export class CloudWalletController {
   @MessagePattern({ cmd: 'accept-proof-request-by-holder' })
   async acceptProofRequest(acceptProofRequestPayload: IAcceptProofRequest): Promise<IProofRequestRes> {
     return this.cloudWalletService.acceptProofRequest(acceptProofRequestPayload);
+  }
+  
+  @MessagePattern({ cmd: 'decline-proof-request-by-holder' })
+  async declineProofRequest(declineProofRequestPayload: IDeclineProofRequest): Promise<IProofRequestRes> {
+    return this.cloudWalletService.declineProofRequest(declineProofRequestPayload);
   }
 
   @MessagePattern({ cmd: 'get-proof-by-proof-id-holder' })
