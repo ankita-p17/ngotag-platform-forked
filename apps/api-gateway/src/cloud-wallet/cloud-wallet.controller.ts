@@ -125,8 +125,8 @@ export class CloudWalletController {
     }
 
     /**
-        * Accept proof request 
-        * @param acceptProofRequest
+        * Decline proof request 
+        * @param DeclineProofRequest
         * @returns sucess message
     */
     @Post('/proofs/decline-request')
