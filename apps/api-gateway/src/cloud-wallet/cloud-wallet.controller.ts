@@ -41,7 +41,7 @@ export class CloudWalletController {
         * @param cloudBaseWalletConfigure
         * @param user 
         * @param res 
-        * @returns sucess message
+        * @returns Success message
     */
     @Post('/configure/base-wallet')
     @ApiOperation({ summary: 'Configure base wallet', description: 'Configure base wallet' })
@@ -71,7 +71,7 @@ export class CloudWalletController {
         * Create cloud wallet
         * @param cloudWalletDetails 
         * @param res 
-        * @returns Sucess message and wallet details
+        * @returns Success message and wallet details
     */
      @Post('/create-wallet')
      @ApiOperation({ summary: 'Create cloud wallet', description: 'Create cloud wallet' })
@@ -100,7 +100,7 @@ export class CloudWalletController {
     /**
         * Accept proof request 
         * @param acceptProofRequest
-        * @returns sucess message
+        * @returns success message
     */
     @Post('/proofs/accept-request')
     @ApiOperation({ summary: 'Accept proof request', description: 'Accept proof request' })
@@ -127,7 +127,7 @@ export class CloudWalletController {
     /**
         * Decline proof request 
         * @param DeclineProofRequest
-        * @returns sucess message
+        * @returns success message
     */
     @Post('/proofs/decline-request')
     @ApiOperation({ summary: 'Accept proof request', description: 'Accept proof request' })
@@ -155,7 +155,7 @@ export class CloudWalletController {
         * Get proof presentation by proof id
         * @param proofRecordId 
         * @param res 
-        * @returns sucess message
+        * @returns success message
     */
     @Post('/proofs/acceptRequestWithCred')
     @ApiOperation({ summary: 'Get proof presentation by Id', description: 'Get proof presentation by Id' })
@@ -186,7 +186,7 @@ export class CloudWalletController {
         * Submit proof presentation
         * @param proofRecordId 
         * @param res 
-        * @returns sucess message
+        * @returns success message
     */
     @Post('/proofs/:proofRecordId')
     @ApiOperation({ summary: 'Get proof presentation by Id', description: 'Get proof presentation by Id' })
@@ -218,7 +218,7 @@ export class CloudWalletController {
    * Get Credentials for request by proof id
    * @param proofRecordId
    * @param res
-   * @returns sucess message
+   * @returns success message
    */
   @Get('/credentialsForRequest/:proofRecordId')
   @ApiOperation({ summary: 'Get proof presentation by Id', description: 'Get proof presentation by Id' })
@@ -250,7 +250,7 @@ export class CloudWalletController {
         * Get proof presentations
         * @param threadId 
         * @param res 
-        * @returns sucess message
+        * @returns success message
     */
     @Get('/proofs')
     @ApiOperation({ summary: 'Get proof presentation', description: 'Get proof presentation' })
@@ -454,7 +454,7 @@ export class CloudWalletController {
    /**
         * Accept proof request 
         * @param CreateConnectionDto
-        * @returns sucess message
+        * @returns success message
     */
    @Post('/connections/invitation')
    @ApiOperation({ summary: 'Create connection invitation for cloud wallet', description: 'Create connection invitation' })
