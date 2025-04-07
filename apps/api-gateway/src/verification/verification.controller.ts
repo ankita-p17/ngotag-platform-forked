@@ -312,6 +312,10 @@ export class VerificationController {
     @Res() res: Response
   ): Promise<Response> {
     proofPresentationPayload.type = 'Verification';
+
+    this.logger.debug(`proof Presentation payload received ${orgId}: ${JSON.stringify(proofPresentationPayload)}`);
+
+
     if (orgId && 'default' === proofPresentationPayload.contextCorrelationId) {
       proofPresentationPayload.orgId = orgId;
     }
