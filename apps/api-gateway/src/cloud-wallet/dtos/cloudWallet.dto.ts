@@ -53,19 +53,16 @@ export class ReceiveInvitationUrlDTO {
   
     @ApiPropertyOptional()
     @IsBoolean({ message: 'autoAcceptConnection must be a boolean' })
-    @Transform(({ value }) => trim(value))
     @IsOptional()
     autoAcceptConnection?: boolean;
   
     @ApiPropertyOptional()
     @IsBoolean({ message: 'autoAcceptInvitation must be a boolean' })
-    @Transform(({ value }) => trim(value))
     @IsOptional()
     autoAcceptInvitation?: boolean;
   
     @ApiPropertyOptional()
     @IsBoolean({ message: 'reuseConnection must be a boolean' })
-    @Transform(({ value }) => trim(value))
     @IsOptional()
     reuseConnection?: boolean;
   
