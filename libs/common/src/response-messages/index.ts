@@ -544,6 +544,7 @@ export const ResponseMessages = {
     error: {
       baseWalletNotFound: 'Base wallet configuration not found',
       createCloudWallet: 'Error while creating cloud wallet on agent',
+      BaseWalletLimitExceeded :'Limit exceeded for base wallet to create subwallet',
       encryptCloudWalletKey: 'Error while creating encrypting wallet key',
       userExist: 'Wallet already exist for the user',
       walletNotExist: 'Wallet not exist for the user',
