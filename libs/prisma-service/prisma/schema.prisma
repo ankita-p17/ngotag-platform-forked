@@ -624,6 +624,9 @@ model cloud_wallet_user_info {
   key                 String?
   connectionImageUrl  String?
   user                user?            @relation(fields: [userId], references: [id])
+  isActive            Boolean         @default(true) // Active/Deactive flag
+  useCount            Int             @default(0) // Current usage count
+  maxSubWallets       Int             @default(5000) // Max allowed count
 }
 
 enum CloudWalletType {

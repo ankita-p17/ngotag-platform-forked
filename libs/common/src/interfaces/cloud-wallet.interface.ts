@@ -96,9 +96,10 @@ export interface IStoreWalletInfo {
   agentApiKey: string;
   agentEndpoint: string;
   type: CloudWalletType;
-  userId: string;
+  userId?: string;
   createdBy: string; 
-  lastChangedBy: string
+  lastChangedBy: string,
+  maxSubWallets: number
 }
 
 export interface IGetStoredWalletInfo {
@@ -176,6 +177,7 @@ export interface ICloudBaseWalletConfigure {
   walletKey: string;
   apiKey: string;
   agentEndpoint: string;
+  maxSubWallets: number;
   userId: string;
   email: string;
   // webhookUrl: string;
