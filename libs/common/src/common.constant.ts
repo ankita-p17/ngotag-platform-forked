@@ -345,6 +345,7 @@ CLOUD_WALLET_CREDENTIAL_FORMAT_DATA = '/multi-tenancy/credentialsFormatData',
 CLOUD_WALLET_PROOF_FORM_DATA='/multi-tenancy/form-data',
 CLOUD_WALLET_DELETE_CREDENTIAL = '/multi-tenancy/credential',
 CLOUD_WALLET_BASIC_MESSAGE = '/multi-tenancy/basic-messages/',
+CLOUD_WALLET_SELF_ATTESTED_W3C_CREDENTIAL='/multi-tenancy/credentials/w3c/self-attested/',
 
 // Bulk-issuance
 BATCH_SIZE = 100,

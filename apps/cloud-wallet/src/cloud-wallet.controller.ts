@@ -2,7 +2,7 @@
 import { Controller } from '@nestjs/common'; // Import the common service in the library
 import { CloudWalletService } from './cloud-wallet.service'; // Import the common service in connection module
 import { MessagePattern } from '@nestjs/microservices'; // Import the nestjs microservices package
-import { IAcceptOffer, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, ICreateCloudWallet, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, ICreateConnection, IConnectionInvitationResponse, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest } from '@credebl/common/interfaces/cloud-wallet.interface';
+import { IAcceptOffer, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, ICreateCloudWallet, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, ICreateConnection, IConnectionInvitationResponse, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest, ISelfAttestedCredential } from '@credebl/common/interfaces/cloud-wallet.interface';
 
 @Controller()
 export class CloudWalletController {
@@ -118,6 +118,11 @@ export class CloudWalletController {
   @MessagePattern({ cmd: 'send-basic-message' })
   async sendBasicMessage(messageDetails: IBasicMessageDetails): Promise<Response> {
     return this.cloudWalletService.sendBasicMessage(messageDetails);
+  }
+
+  @MessagePattern({ cmd: 'create-self-attested-w3c-credential' })
+  async createSelfAttestedW3cCredential(selfAttestedCredential: ISelfAttestedCredential): Promise<Response> {
+    return this.cloudWalletService.createSelfAttestedW3cCredential(selfAttestedCredential);
   }
   
 }

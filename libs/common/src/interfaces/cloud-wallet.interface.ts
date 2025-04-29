@@ -443,3 +443,24 @@ interface Proof {
   jws:                string;
 }
 
+type JsonValue = string | number | boolean | null | JsonObject | JsonArray
+type JsonArray = Array<JsonValue>
+type SingleOrArray<T> = T | T[]
+
+interface JsonObject {
+    [property: string]: JsonValue
+}
+
+export interface ISelfAttestedCredential {
+  '@context': Array<string | JsonObject>;
+
+  type: string[];
+
+  credentialSubject: SingleOrArray<JsonObject>;
+  [key: string]: unknown;
+
+  proofType: string;
+
+  userId: string;
+  email: string;
+}

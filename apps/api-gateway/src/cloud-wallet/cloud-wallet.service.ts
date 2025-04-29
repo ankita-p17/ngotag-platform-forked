@@ -4,6 +4,7 @@ import { Inject, Injectable} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 // import { Prisma } from '@prisma/client';
 import { BaseService } from 'libs/service/base.service';
+import { SelfAttestedCredentialDto } from './dtos/self-attested-credential.dto';
 
 @Injectable()
 export class CloudWalletService extends BaseService {
@@ -147,5 +148,11 @@ sendBasicMessage(
   messageDetails: IBasicMessageDetails
 ): Promise<Response> {
   return this.sendNatsMessage(this.cloudWalletServiceProxy, 'send-basic-message', messageDetails);
+}
+
+createSelfAttestedW3cCredential(selfAttestedCredentialDto: SelfAttestedCredentialDto): Promise<{
+    response: object;
+}> {
+    return this.sendNats(this.cloudWalletServiceProxy, 'create-self-attested-w3c-credential', selfAttestedCredentialDto);
 }
 }

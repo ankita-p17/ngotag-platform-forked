@@ -528,6 +528,7 @@ export const ResponseMessages = {
       acceptProofRequest: 'Proof request has been successfully accepted.',
       declineProofRequest: 'Proof request has been successfully declined.',
       createConnection: 'Connection created successfully.',
+      createSelfAttestedW3cCredential: 'Self-attested W3c credential created successfully',
       basicMessage: 'Basic message send successfully',
       getProofById: 'Proof presentation has been successfully received.',
       getCredentialsByProofId: 'Credentials fetch by proof request id',
@@ -555,7 +556,8 @@ export const ResponseMessages = {
       agentAlreadyExist: 'Agent already exist.',
       platformAdminRecordNotFound: 'Platform admin reocrd not exist.',
       notFoundBaseWallet: 'The base wallet record is missing.',
-      walletRecordNotFound: 'Wallet record not found.'
+      walletRecordNotFound: 'Wallet record not found.',
+      createSelfAttestedW3cCredential: 'Error while creating self-attested credential.'
     }
   }
 };

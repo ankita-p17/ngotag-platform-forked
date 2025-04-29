@@ -22,6 +22,7 @@ import { IBasicMessage, IConnectionDetailsById, ICredentialDetails, IGetCredenti
 import { CreateConnectionDto } from './dtos/create-connection.dto';
 import { ProofWithCredDto } from './dtos/accept-proof-request-with-cred.dto';
 import { DeclineProofRequestDto } from './dtos/decline-proof-request.dto';
+import { SelfAttestedCredentialDto } from './dtos/self-attested-credential.dto';
 
 
 @UseFilters(CustomExceptionFilter)
@@ -537,6 +538,33 @@ export class CloudWalletController {
            data: connectionDetailResponse
        };
        return res.status(HttpStatus.OK).json(finalResponse);
+   }
+
+    /**
+        * Create self-attested credential 
+        * @param SelfAttestedCredentialDto
+        * @returns success message
+    */
+   @Post('/credentals/w3c/self-attested')
+   @ApiOperation({ summary: 'Create self-attested W3C credential for cloud wallet', description: 'Create self-attested W3C credential for cloud wallet' })
+   @ApiResponse({ status: HttpStatus.CREATED, description: 'Success', type: ApiResponseDto })
+   @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+   async createSelfAttestedW3cCredential(
+       @Res() res: Response,
+       @Body() selfAttestedCredentialDto: SelfAttestedCredentialDto,
+       @User() user: user
+   ): Promise<Response> {
+       const { id, email } = user;
+       selfAttestedCredentialDto.userId = id;
+       selfAttestedCredentialDto.email = email;
+
+       const selfAttestedCredential = await this.cloudWalletService.createSelfAttestedW3cCredential(selfAttestedCredentialDto);
+       const finalResponse: IResponse = {
+           statusCode: HttpStatus.CREATED,
+           message: ResponseMessages.cloudWallet.success.createSelfAttestedW3cCredential,
+           data: selfAttestedCredential
+       };
+       return res.status(HttpStatus.CREATED).json(finalResponse);
    }
 
     /**
