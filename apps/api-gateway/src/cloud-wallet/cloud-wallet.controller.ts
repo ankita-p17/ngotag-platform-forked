@@ -18,7 +18,7 @@ import { validateDid } from '@credebl/common/did.validator';
 import { CommonConstants } from '@credebl/common/common.constant';
 import { UserRoleGuard } from '../authz/guards/user-role.guard';
 import { AcceptProofRequestDto } from './dtos/accept-proof-request.dto';
-import { IBasicMessage, IConnectionDetailsById, ICredentialDetails, IGetCredentialsForRequest, IGetProofPresentation, IGetProofPresentationById, IProofPresentationPayloadWithCred, IProofPresentationDetails, IWalletDetailsForDidList } from '@credebl/common/interfaces/cloud-wallet.interface';
+import { IBasicMessage, IConnectionDetailsById, ICredentialDetails, IGetCredentialsForRequest, IGetProofPresentation, IGetProofPresentationById, IProofPresentationPayloadWithCred, IProofPresentationDetails, IWalletDetailsForDidList, IW3cCredentials } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { CreateConnectionDto } from './dtos/create-connection.dto';
 import { ProofWithCredDto } from './dtos/accept-proof-request-with-cred.dto';
 import { DeclineProofRequestDto } from './dtos/decline-proof-request.dto';
@@ -596,6 +596,35 @@ export class CloudWalletController {
         return res.status(HttpStatus.OK).json(finalResponse);
     }
 
+     /**
+        * Get W3C credential list by tenant id
+        * @param res 
+        * @returns Credential list
+    */
+     @Get('/credentials/w3c')
+     @ApiOperation({ summary: 'Get W3C credential list for cloud wallet', description: 'Get W3C credential list for cloud wallet' })
+     @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: ApiResponseDto })
+     @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+     async getAllW3cCredentials(
+         @Res() res: Response,
+         @User() user: user
+     ): Promise<Response> {
+         const { id, email } = user;
+  
+         const credentialDetail: IW3cCredentials = {
+            userId: id,
+            email
+         };
+
+         const w3cCredentials = await this.cloudWalletService.getAllW3cCredentials(credentialDetail);
+         const finalResponse: IResponse = {
+             statusCode: HttpStatus.OK,
+             message: ResponseMessages.cloudWallet.success.credentials,
+             data: w3cCredentials
+         };
+         return res.status(HttpStatus.OK).json(finalResponse);
+     }
+
     /**
         * Get credential list by tenant id
         * @param credentialListQueryOptions 
@@ -628,6 +657,37 @@ export class CloudWalletController {
         return res.status(HttpStatus.OK).json(finalResponse);
     }
 
+     /**
+        * Get W3C credential by Record Id
+        * @param credentialListQueryOptions 
+        * @param res 
+        * @returns Credential Detail
+    */
+     @Get('/credential/w3c/:credentialRecordId')
+     @ApiOperation({ summary: 'Get credential by credential record Id', description: 'Get credential by credential record Id' })
+     @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: ApiResponseDto })
+     @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+     async getW3cCredentialByCredentialRecordId(
+         @Param('credentialRecordId') credentialRecordId: string,
+         @Res() res: Response,
+         @User() user: user
+     ): Promise<Response> {
+         const { id, email } = user;
+  
+         const credentialDetails: IW3cCredentials = {
+             userId: id,
+             email,
+             credentialRecordId
+         };
+ 
+         const w3cCredential = await this.cloudWalletService.getW3cCredentialByCredentialRecordId(credentialDetails);
+         const finalResponse: IResponse = {
+             statusCode: HttpStatus.OK,
+             message: ResponseMessages.cloudWallet.success.credentialByRecordId,
+             data: w3cCredential
+         };
+         return res.status(HttpStatus.OK).json(finalResponse);
+     }
   /**
    * Get credential Format data by credential id
    * @param credentialListQueryOptions

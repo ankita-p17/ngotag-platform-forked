@@ -2,7 +2,7 @@
 import { Controller } from '@nestjs/common'; // Import the common service in the library
 import { CloudWalletService } from './cloud-wallet.service'; // Import the common service in connection module
 import { MessagePattern } from '@nestjs/microservices'; // Import the nestjs microservices package
-import { IAcceptOffer, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, ICreateCloudWallet, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, ICreateConnection, IConnectionInvitationResponse, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest, ISelfAttestedCredential } from '@credebl/common/interfaces/cloud-wallet.interface';
+import { IAcceptOffer, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, ICreateCloudWallet, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, ICreateConnection, IConnectionInvitationResponse, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest, ISelfAttestedCredential, IW3cCredentials } from '@credebl/common/interfaces/cloud-wallet.interface';
 
 @Controller()
 export class CloudWalletController {
@@ -88,10 +88,20 @@ export class CloudWalletController {
   async getCredentialList(tenantDetails: ITenantDetail): Promise<Response> {
     return this.cloudWalletService.getCredentialListById(tenantDetails);
   }
+
+  @MessagePattern({ cmd: 'get-all-w3c-credenentials' })
+  async getAllW3cCredentials(w3cCredential: IW3cCredentials): Promise<Response> {
+    return this.cloudWalletService.getAllW3cCredentials(w3cCredential);
+  }
   
   @MessagePattern({ cmd: 'wallet-credential-by-record-id' })
   async getCredentialByCredentialRecordId(credentialDetails: ICredentialDetails): Promise<Response> {
     return this.cloudWalletService.getCredentialByRecord(credentialDetails);
+  }
+
+  @MessagePattern({ cmd: 'get-w3c-credential-by-record-id' })
+  async getW3cCredentialByRecordId(w3cCredential: IW3cCredentials): Promise<Response> {
+    return this.cloudWalletService.getW3cCredentialByRecordId(w3cCredential);
   }
 
   @MessagePattern({ cmd: 'wallet-credentialFormatData-by-record-id' })

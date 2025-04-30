@@ -1,5 +1,5 @@
 
-import { IAcceptOffer, ICreateCloudWallet, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, ICreateConnection, IConnectionInvitationResponse, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest } from '@credebl/common/interfaces/cloud-wallet.interface';
+import { IAcceptOffer, ICreateCloudWallet, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, ICreateConnection, IConnectionInvitationResponse, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest, IW3cCredentials } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { Inject, Injectable} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 // import { Prisma } from '@prisma/client';
@@ -112,6 +112,18 @@ getCredentialList(
   tenantDetails: ITenantDetail
 ): Promise<Response> {
   return this.sendNatsMessage(this.cloudWalletServiceProxy, 'wallet-credential-by-id', tenantDetails);
+}
+
+getAllW3cCredentials(
+  w3cCredentials: IW3cCredentials
+): Promise<Response> {
+  return this.sendNatsMessage(this.cloudWalletServiceProxy, 'get-all-w3c-credenentials', w3cCredentials);
+}
+
+getW3cCredentialByCredentialRecordId(
+  w3CcredentialDetail: IW3cCredentials
+): Promise<Response> {
+  return this.sendNatsMessage(this.cloudWalletServiceProxy, 'get-w3c-credential-by-record-id', w3CcredentialDetail);
 }
 
 getCredentialByCredentialRecordId(

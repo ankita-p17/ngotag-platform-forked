@@ -42,7 +42,8 @@ import {
   ICredentialForRequestRes,
   IProofPresentationPayloadWithCred,
   IDeclineProofRequest,
-  ISelfAttestedCredential
+  ISelfAttestedCredential,
+  IW3cCredentials
 } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { CloudWalletRepository } from './cloud-wallet.repository';
 import { ResponseMessages } from '@credebl/common/response-messages';
@@ -817,6 +818,54 @@ export class CloudWalletService {
     } catch (error) {
       this.logger.error(`[createSelfAttestedW3cCredential] - error in create self-attested credential: ${error}`);
       await this.commonService.handleError(error);
+    }
+  }
+
+  /**
+   * Get all W3C credential by tenant id
+   * @param w3cCredential
+   * @returns W3C Credential list
+   */
+  async getAllW3cCredentials(w3cCredential: IW3cCredentials): Promise<Response> {
+    try {
+      const { userId } = w3cCredential;
+      const [baseWalletDetails, getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
+  
+      const {tenantId} = getTenant;
+  
+      const { agentEndpoint } = baseWalletDetails;
+
+      const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_W3C_CREDENTIAL}${tenantId}`;
+
+      const credentialDetailResponse = await this.commonService.httpGet(url, { headers: { authorization: decryptedApiKey } });
+      return credentialDetailResponse;
+    } catch (error) {
+      await this.commonService.handleError(error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get W3C credential by record id
+   * @param w3cCredential
+   * @returns W3C credential Details
+   */
+  async getW3cCredentialByRecordId(w3cCredential: IW3cCredentials): Promise<Response> {
+    try {
+      const { userId, credentialRecordId } = w3cCredential;
+      const [baseWalletDetails, getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
+  
+      const {tenantId} = getTenant;
+  
+      const { agentEndpoint } = baseWalletDetails;
+
+      const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_W3C_CREDENTIAL}${tenantId}/${credentialRecordId}`;
+
+      const credentialDetailResponse = await this.commonService.httpGet(url, { headers: { authorization: decryptedApiKey } });
+      return credentialDetailResponse;
+    } catch (error) {
+      await this.commonService.handleError(error);
+      throw error;
     }
   }
 }
