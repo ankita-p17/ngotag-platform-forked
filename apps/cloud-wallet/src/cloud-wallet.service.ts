@@ -41,12 +41,15 @@ import {
   IGetCredentialsForRequest,
   ICredentialForRequestRes,
   IProofPresentationPayloadWithCred,
-  IDeclineProofRequest
+  IDeclineProofRequest,
+  BaseAgentInfo
 } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { CloudWalletRepository } from './cloud-wallet.repository';
 import { ResponseMessages } from '@credebl/common/response-messages';
 import { CloudWalletType } from '@credebl/enum/enum';
 import { CommonConstants } from '@credebl/common/common.constant';
+import { user } from '@prisma/client';
+import { UpdateBaseWalletDto } from 'apps/api-gateway/src/cloud-wallet/dtos/cloudWallet.dto';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const md5 = require('md5');
 
@@ -418,6 +421,32 @@ export class CloudWalletService {
       await this.commonService.handleError(error);
     }
   }
+
+
+    /**
+   * Create clous wallet
+   * @param cloudWalletDetails
+   * @returns cloud wallet details
+   */
+    async getBaseWalletDetails(user:user): Promise<BaseAgentInfo[]> {
+      try {
+        const baseWalletDetails = await this.cloudWalletRepository.getBaseWalletDetails(CloudWalletType.BASE_WALLET, user);
+        return baseWalletDetails;
+      } catch (error) {
+        this.logger.error(`[createCloudWallet] - error in create cloud wallet: ${error}`);
+        await this.commonService.handleError(error);
+      }
+    }
+
+    async updateBaseWalletDetails(updateBaseWalletDto:UpdateBaseWalletDto): Promise<BaseAgentInfo> {
+      try {
+        const baseWalletDetails = await this.cloudWalletRepository.updateBaseWalletDetails(CloudWalletType.BASE_WALLET, updateBaseWalletDto);
+        return baseWalletDetails;
+      } catch (error) {
+        this.logger.error(`[createCloudWallet] - error in create cloud wallet: ${error}`);
+        await this.commonService.handleError(error);
+      }
+    }
 
   /**
    * Receive invitation

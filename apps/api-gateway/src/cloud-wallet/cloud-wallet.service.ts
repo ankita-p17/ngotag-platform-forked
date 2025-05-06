@@ -1,9 +1,11 @@
 
-import { IAcceptOffer, ICreateCloudWallet, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, ICreateConnection, IConnectionInvitationResponse, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest } from '@credebl/common/interfaces/cloud-wallet.interface';
+import { IAcceptOffer, ICreateCloudWallet, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, ICreateConnection, IConnectionInvitationResponse, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest, BaseAgentInfo } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { Inject, Injectable} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
+import { user } from '@prisma/client';
 // import { Prisma } from '@prisma/client';
 import { BaseService } from 'libs/service/base.service';
+import { UpdateBaseWalletDto } from './dtos/cloudWallet.dto';
 
 @Injectable()
 export class CloudWalletService extends BaseService {
@@ -72,6 +74,14 @@ export class CloudWalletService extends BaseService {
     cloudWalletDetails: ICreateCloudWallet
   ): Promise<IStoredWalletDetails> {
     return this.sendNatsMessage(this.cloudWalletServiceProxy, 'create-cloud-wallet', cloudWalletDetails);
+  }
+
+  getBaseWalletDetails(user: user): Promise<BaseAgentInfo[]> {
+    return this.sendNatsMessage(this.cloudWalletServiceProxy, 'get-base-wallet-details', user);
+  }
+  
+  updateBaseWalletDetails(updateBaseWalletDto: UpdateBaseWalletDto): Promise<BaseAgentInfo[]> {
+    return this.sendNatsMessage(this.cloudWalletServiceProxy, 'update-base-wallet-details', updateBaseWalletDto);
   }
 
   receiveInvitationByUrl(

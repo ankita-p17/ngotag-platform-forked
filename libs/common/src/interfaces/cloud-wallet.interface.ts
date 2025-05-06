@@ -445,3 +445,9 @@ interface Proof {
   jws:                string;
 }
 
+export interface BaseAgentInfo {
+  agentEndpoint: string;
+  useCount: number;
+  maxSubWallets: number;
+}
+

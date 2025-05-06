@@ -2,7 +2,9 @@
 import { Controller } from '@nestjs/common'; // Import the common service in the library
 import { CloudWalletService } from './cloud-wallet.service'; // Import the common service in connection module
 import { MessagePattern } from '@nestjs/microservices'; // Import the nestjs microservices package
-import { IAcceptOffer, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, ICreateCloudWallet, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, ICreateConnection, IConnectionInvitationResponse, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest } from '@credebl/common/interfaces/cloud-wallet.interface';
+import { IAcceptOffer, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, ICreateCloudWallet, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, ICreateConnection, IConnectionInvitationResponse, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest, BaseAgentInfo } from '@credebl/common/interfaces/cloud-wallet.interface';
+import { user as User } from '@prisma/client';
+import { UpdateBaseWalletDto } from 'apps/api-gateway/src/cloud-wallet/dtos/cloudWallet.dto';
 
 @Controller()
 export class CloudWalletController {
@@ -51,6 +53,16 @@ export class CloudWalletController {
   @MessagePattern({ cmd: 'create-cloud-wallet' })
   async createConnectionInvitation(cloudWalletDetails: ICreateCloudWallet): Promise<IStoredWalletDetails> {
     return this.cloudWalletService.createCloudWallet(cloudWalletDetails);
+  }
+
+  @MessagePattern({ cmd: 'get-base-wallet-details' })
+  async getBaseWalletDetails(user:User): Promise<BaseAgentInfo[]> {
+    return this.cloudWalletService.getBaseWalletDetails(user);
+  }
+  
+  @MessagePattern({ cmd: 'update-base-wallet-details' })
+  async updateBaseWalletDetails(updateBaseWalletDto:UpdateBaseWalletDto): Promise<BaseAgentInfo> {
+    return this.cloudWalletService.updateBaseWalletDetails(updateBaseWalletDto);
   }
 
   @MessagePattern({ cmd: 'receive-invitation-by-url' })
