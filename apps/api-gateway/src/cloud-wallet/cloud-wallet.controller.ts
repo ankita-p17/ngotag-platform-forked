@@ -1,11 +1,11 @@
 import { IResponse } from '@credebl/common/interfaces/response.interface';
 import { ResponseMessages } from '@credebl/common/response-messages';
-import { Controller, Post, Logger, Body, HttpStatus, Res, UseFilters, UseGuards, Get, Param, Query, BadRequestException, Delete } from '@nestjs/common';
+import { Controller, Post, Logger, Body, HttpStatus, Res, UseFilters, UseGuards, Get, Param, Query, BadRequestException, Delete, Patch } from '@nestjs/common';
 import { ApiBearerAuth, ApiForbiddenResponse, ApiOperation, ApiQuery, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { ForbiddenErrorDto } from '../dtos/forbidden-error.dto';
 import { UnauthorizedErrorDto } from '../dtos/unauthorized-error.dto';
 import { CloudWalletService } from './cloud-wallet.service';
-import { AcceptOfferDto, BasicMessageDTO, CreateCloudWalletDidDto, CreateCloudWalletDto, CredentialListDto, GetAllCloudWalletConnectionsDto, ReceiveInvitationUrlDTO } from './dtos/cloudWallet.dto';
+import { AcceptOfferDto, BasicMessageDTO, CreateCloudWalletDidDto, CreateCloudWalletDto, CredentialListDto, GetAllCloudWalletConnectionsDto, ReceiveInvitationUrlDTO, UpdateBaseWalletDto } from './dtos/cloudWallet.dto';
 import { Response } from 'express';
 import { CustomExceptionFilter } from 'apps/api-gateway/common/exception-handler';
 import { ApiResponseDto } from '../dtos/apiResponse.dto';
@@ -94,6 +94,49 @@ export class CloudWalletController {
          };
          return res.status(HttpStatus.CREATED).json(finalResponse);
  
+     }
+
+     @Get('get-active-base-wallet')
+     @ApiOperation({ summary: 'Create cloud wallet', description: 'Create cloud wallet' })
+     @ApiResponse({ status: HttpStatus.CREATED, description: 'Created', type: ApiResponseDto })
+     @ApiBearerAuth()
+     @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+     async getBaseWalletDetails(
+         @Res() res: Response,
+         @User() user: user
+     ): Promise<Response> {
+         const baseWalletData = await this.cloudWalletService.getBaseWalletDetails(user);
+         const finalResponse: IResponse = {
+             statusCode: HttpStatus.OK,
+             message: ResponseMessages.cloudWallet.success.getBaseWalletInfo,
+             data: baseWalletData
+         };
+         return res.status(HttpStatus.CREATED).json(finalResponse);
+     }
+
+     @Patch('/base-wallet/:walletId')
+     @ApiOperation({ summary: 'Update base wallet', description: 'Update base wallet' })
+     @ApiResponse({ status: HttpStatus.CREATED, description: 'Created', type: ApiResponseDto })
+     @ApiBearerAuth()
+     @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+     async updateBaseWalletDetails(
+         @Param('walletId') walletId:string,
+         @Body() updateBaseWalletDto:UpdateBaseWalletDto,
+         @User() user: user,
+         @Res() res: Response
+     ): Promise<Response> {
+
+        const {email, id} = user;
+        updateBaseWalletDto.email = email;
+        updateBaseWalletDto.userId = id;
+        updateBaseWalletDto.walletId = walletId;
+         const baseWalletData = await this.cloudWalletService.updateBaseWalletDetails(updateBaseWalletDto);
+         const finalResponse: IResponse = {
+             statusCode: HttpStatus.OK,
+             message: ResponseMessages.cloudWallet.success.getBaseWalletInfo,
+             data: baseWalletData
+         };
+         return res.status(HttpStatus.CREATED).json(finalResponse);
      }
 
 

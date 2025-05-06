@@ -3,7 +3,8 @@ import { PrismaService } from '@credebl/prisma-service';
 import { CloudWalletType } from '@credebl/enum/enum';
 // eslint-disable-next-line camelcase
 import { cloud_wallet_user_info, Prisma, user } from '@prisma/client';
-import { ICloudWalletDetails, IGetStoredWalletInfo, IStoredWalletDetails, IStoreWalletInfo } from '@credebl/common/interfaces/cloud-wallet.interface';
+import { BaseAgentInfo, ICloudWalletDetails, IGetStoredWalletInfo, IStoredWalletDetails, IStoreWalletInfo } from '@credebl/common/interfaces/cloud-wallet.interface';
+import { UpdateBaseWalletDto } from 'apps/api-gateway/src/cloud-wallet/dtos/cloudWallet.dto';
 
 
 @Injectable()
@@ -26,6 +27,56 @@ export class CloudWalletRepository {
       return agentDetails;
     } catch (error) {
       this.logger.error(`Error in getCloudWalletBaseAgentDetails: ${error.message}`);
+      throw error;
+    }
+  }
+  
+
+  // eslint-disable-next-line camelcase
+  async getBaseWalletDetails(type: CloudWalletType, user:user): Promise<BaseAgentInfo[]> {
+    try {
+      const agentDetails = await this.prisma.cloud_wallet_user_info.findMany({
+        where: {
+          type,
+          isActive:true,
+          createdBy:user.id
+        },
+        select: {
+          id:true,
+          agentEndpoint:true,
+          useCount:true,
+          maxSubWallets:true
+        }
+      });
+      return agentDetails;
+    } catch (error) {
+      this.logger.error(`Error in getCloudWalletBaseAgentDetails: ${error.message}`);
+      throw error;
+    }
+  }
+  
+  // eslint-disable-next-line camelcase
+  async updateBaseWalletDetails(type: CloudWalletType, updateBaseWalletDto:UpdateBaseWalletDto): Promise<BaseAgentInfo> {
+    try {
+      const agentDetails = await this.prisma.cloud_wallet_user_info.update({
+        where: {
+          id:updateBaseWalletDto.walletId,
+          createdBy:updateBaseWalletDto.userId
+        },
+        data: {
+          isActive: updateBaseWalletDto.isActive,
+          maxSubWallets:updateBaseWalletDto.maxSubWallets
+        },
+        select:{
+          id:true,
+          agentEndpoint:true,
+          useCount:true,
+          maxSubWallets:true
+        }
+      });
+      return agentDetails;
+    } catch (error) {
+      this.logger.error(`Error in UpdateCloudWalletBaseAgentDetails: ${error.message}`);
       throw error;
     }
   }
