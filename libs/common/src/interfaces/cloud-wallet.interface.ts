@@ -1,5 +1,6 @@
 import { CloudWalletType } from '@credebl/enum/enum';
 import { $Enums } from '@prisma/client';
+import { JsonValue, SingleOrArray } from 'apps/api-gateway/src/issuance/utils/helper';
 
 export class ICreateCloudWallet {
     label: string;
@@ -450,4 +451,26 @@ export interface BaseAgentInfo {
   useCount: number;
   maxSubWallets: number;
 }
+interface JsonObject {
+    [property: string]: JsonValue
+}
 
+export interface ISelfAttestedCredential {
+  '@context': Array<string | JsonObject>;
+
+  type: string[];
+
+  credentialSubject: SingleOrArray<JsonObject>;
+  [key: string]: unknown;
+
+  proofType: string;
+
+  userId: string;
+  email: string;
+}
+
+export interface IW3cCredentials {
+  userId: string;
+  email: string;
+  credentialRecordId?: string;
+}

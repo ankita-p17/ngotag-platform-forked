@@ -42,7 +42,9 @@ import {
   ICredentialForRequestRes,
   IProofPresentationPayloadWithCred,
   IDeclineProofRequest,
-  BaseAgentInfo
+  BaseAgentInfo,
+  ISelfAttestedCredential,
+  IW3cCredentials
 } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { CloudWalletRepository } from './cloud-wallet.repository';
 import { ResponseMessages } from '@credebl/common/response-messages';
@@ -781,6 +783,29 @@ export class CloudWalletService {
           }
         }
 
+
+    /**
+    * Delete W3C credential by record id
+    * @param credentialDetails
+    */
+    async deleteW3cCredentialByRecord(credentialDetails: ICredentialDetails): Promise<Response> {
+      try {
+        const { userId, credentialRecordId } = credentialDetails;
+        const [getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
+           
+        const {tenantId} = getTenant;
+        const { agentEndpoint } = getTenant;
+  
+        const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_DELETE_W3C_CREDENTIAL}/${credentialRecordId}/${tenantId}`;
+  
+        const credentialDetailResponse = await this.commonService.httpDelete(url, { headers: { authorization: decryptedApiKey } });
+        return credentialDetailResponse;
+      } catch (error) {
+        await this.commonService.handleError(error);
+        throw error;
+      }
+    }
+    
   /**
    * Get basic-message by connection id
    * @param connectionDetails
@@ -822,6 +847,94 @@ export class CloudWalletService {
         headers: { authorization: decryptedApiKey }
       });
       return basicMessageResponse;
+    } catch (error) {
+      await this.commonService.handleError(error);
+      throw error;
+    }
+  }
+
+     /**
+   * Create self-attested W3C credential
+   * @param selfAttestedCredential
+   * @returns Self-attested credential Details
+   */
+  async createSelfAttestedW3cCredential(selfAttestedCredential: ISelfAttestedCredential): Promise<Response> {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { email, userId, ...selfAttestedDetails } = selfAttestedCredential;
+
+      const [getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
+           
+      const {tenantId} = getTenant;
+      const { agentEndpoint } = getTenant;
+
+      const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_SELF_ATTESTED_W3C_CREDENTIAL}${tenantId}`;
+
+      const checkCloudWalletAgentHealth = await this.commonService.checkAgentHealth(agentEndpoint, decryptedApiKey);
+
+      if (!checkCloudWalletAgentHealth) {
+        throw new NotFoundException(ResponseMessages.cloudWallet.error.agentNotRunning);
+      }
+      const selfAttestedCredentialResponse = await this.commonService.httpPost(url, selfAttestedDetails, {
+        headers: { authorization: decryptedApiKey }
+      });
+
+      if (!selfAttestedCredentialResponse) {
+        throw new InternalServerErrorException(ResponseMessages.cloudWallet.error.createSelfAttestedW3cCredential, {
+          cause: new Error(),
+          description: ResponseMessages.errorMessages.serverError
+        });
+      }
+
+      selfAttestedCredentialResponse.tenantId = tenantId;
+
+      return selfAttestedCredentialResponse;
+    } catch (error) {
+      this.logger.error(`[createSelfAttestedW3cCredential] - error in create self-attested credential: ${error}`);
+      await this.commonService.handleError(error);
+    }
+  }
+
+  /**
+   * Get all W3C credential by tenant id
+   * @param w3cCredential
+   * @returns W3C Credential list
+   */
+  async getAllW3cCredentials(w3cCredential: IW3cCredentials): Promise<Response> {
+    try {
+      const { userId } = w3cCredential;
+      const [getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
+           
+      const {tenantId} = getTenant;
+      const { agentEndpoint } = getTenant;
+
+      const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_W3C_CREDENTIAL}${tenantId}`;
+
+      const credentialDetailResponse = await this.commonService.httpGet(url, { headers: { authorization: decryptedApiKey } });
+      return credentialDetailResponse;
+    } catch (error) {
+      await this.commonService.handleError(error);
+      throw error;
+    }
+  }
+
+  /**
+   * Get W3C credential by record id
+   * @param w3cCredential
+   * @returns W3C credential Details
+   */
+  async getW3cCredentialByRecordId(w3cCredential: IW3cCredentials): Promise<Response> {
+    try {
+      const { userId, credentialRecordId } = w3cCredential;
+      const [getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
+           
+      const {tenantId} = getTenant;
+      const { agentEndpoint } = getTenant;
+
+      const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_W3C_CREDENTIAL}${tenantId}/${credentialRecordId}`;
+
+      const credentialDetailResponse = await this.commonService.httpGet(url, { headers: { authorization: decryptedApiKey } });
+      return credentialDetailResponse;
     } catch (error) {
       await this.commonService.handleError(error);
       throw error;

@@ -341,10 +341,13 @@ CLOUD_WALLET_DECLINE_PROOF_REQUEST = '/decline-request/',
 CLOUD_WALLET_DID_LIST = '/multi-tenancy/dids/',
 CLOUD_WALLET_CONNECTION_BY_ID = '/multi-tenancy/connections/',
 CLOUD_WALLET_CREDENTIAL = '/multi-tenancy/credentials',
+CLOUD_WALLET_W3C_CREDENTIAL = '/multi-tenancy/credentials/w3c/',
 CLOUD_WALLET_CREDENTIAL_FORMAT_DATA = '/multi-tenancy/credentialsFormatData',
 CLOUD_WALLET_PROOF_FORM_DATA='/multi-tenancy/form-data',
 CLOUD_WALLET_DELETE_CREDENTIAL = '/multi-tenancy/credential',
+CLOUD_WALLET_DELETE_W3C_CREDENTIAL = '/multi-tenancy/credential/w3c',
 CLOUD_WALLET_BASIC_MESSAGE = '/multi-tenancy/basic-messages/',
+CLOUD_WALLET_SELF_ATTESTED_W3C_CREDENTIAL='/multi-tenancy/credentials/w3c/self-attested/',
 
 // Bulk-issuance
 BATCH_SIZE = 100,

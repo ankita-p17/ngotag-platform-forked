@@ -1,11 +1,12 @@
 
-import { IAcceptOffer, ICreateCloudWallet, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, ICreateConnection, IConnectionInvitationResponse, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest, BaseAgentInfo } from '@credebl/common/interfaces/cloud-wallet.interface';
+import { IAcceptOffer, ICreateCloudWallet, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, ICreateConnection, IConnectionInvitationResponse, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest, BaseAgentInfo, IW3cCredentials } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { Inject, Injectable} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { user } from '@prisma/client';
 // import { Prisma } from '@prisma/client';
 import { BaseService } from 'libs/service/base.service';
 import { UpdateBaseWalletDto } from './dtos/cloudWallet.dto';
+import { SelfAttestedCredentialDto } from './dtos/self-attested-credential.dto';
 
 @Injectable()
 export class CloudWalletService extends BaseService {
@@ -123,6 +124,18 @@ getCredentialList(
   return this.sendNatsMessage(this.cloudWalletServiceProxy, 'wallet-credential-by-id', tenantDetails);
 }
 
+getAllW3cCredentials(
+  w3cCredentials: IW3cCredentials
+): Promise<Response> {
+  return this.sendNatsMessage(this.cloudWalletServiceProxy, 'get-all-w3c-credenentials', w3cCredentials);
+}
+
+getW3cCredentialByCredentialRecordId(
+  w3CcredentialDetail: IW3cCredentials
+): Promise<Response> {
+  return this.sendNatsMessage(this.cloudWalletServiceProxy, 'get-w3c-credential-by-record-id', w3CcredentialDetail);
+}
+
 getCredentialByCredentialRecordId(
   credentialDetails: ICredentialDetails
 ): Promise<Response> {
@@ -147,6 +160,12 @@ deleteCredentialByCredentialRecordId(
   return this.sendNatsMessage(this.cloudWalletServiceProxy, 'delete-credential-by-record-id', credentialDetails);
 }
 
+deleteW3cCredentialByCredentialRecordId(
+  credentialDetails: ICredentialDetails
+): Promise<Response> {
+  return this.sendNatsMessage(this.cloudWalletServiceProxy, 'delete-w3c-credential-by-record-id', credentialDetails);
+}
+
 getBasicMessageByConnectionId(
   connectionDetails: IBasicMessage
 ): Promise<Response> {
@@ -157,5 +176,9 @@ sendBasicMessage(
   messageDetails: IBasicMessageDetails
 ): Promise<Response> {
   return this.sendNatsMessage(this.cloudWalletServiceProxy, 'send-basic-message', messageDetails);
+}
+
+createSelfAttestedW3cCredential(selfAttestedCredentialDto: SelfAttestedCredentialDto): Promise<Response> {
+    return this.sendNatsMessage(this.cloudWalletServiceProxy, 'create-self-attested-w3c-credential', selfAttestedCredentialDto);
 }
 }
