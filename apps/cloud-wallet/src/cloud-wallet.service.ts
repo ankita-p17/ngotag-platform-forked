@@ -791,10 +791,10 @@ export class CloudWalletService {
     async deleteW3cCredentialByRecord(credentialDetails: ICredentialDetails): Promise<Response> {
       try {
         const { userId, credentialRecordId } = credentialDetails;
-        const [baseWalletDetails, getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
-        
+        const [getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
+           
         const {tenantId} = getTenant;
-        const { agentEndpoint } = baseWalletDetails;
+        const { agentEndpoint } = getTenant;
   
         const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_DELETE_W3C_CREDENTIAL}/${credentialRecordId}/${tenantId}`;
   
@@ -863,15 +863,10 @@ export class CloudWalletService {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { email, userId, ...selfAttestedDetails } = selfAttestedCredential;
 
-      const checkUserExist = await this.cloudWalletRepository.checkUserExist(userId);
-
-      if (!checkUserExist) {
-        throw new ConflictException(ResponseMessages.cloudWallet.error.walletNotExist);
-      }
-      const [baseWalletDetails, getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
-
-      const { tenantId } = getTenant;
-      const { agentEndpoint } = baseWalletDetails;
+      const [getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
+           
+      const {tenantId} = getTenant;
+      const { agentEndpoint } = getTenant;
 
       const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_SELF_ATTESTED_W3C_CREDENTIAL}${tenantId}`;
 
@@ -908,11 +903,10 @@ export class CloudWalletService {
   async getAllW3cCredentials(w3cCredential: IW3cCredentials): Promise<Response> {
     try {
       const { userId } = w3cCredential;
-      const [baseWalletDetails, getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
-  
+      const [getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
+           
       const {tenantId} = getTenant;
-  
-      const { agentEndpoint } = baseWalletDetails;
+      const { agentEndpoint } = getTenant;
 
       const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_W3C_CREDENTIAL}${tenantId}`;
 
@@ -932,11 +926,10 @@ export class CloudWalletService {
   async getW3cCredentialByRecordId(w3cCredential: IW3cCredentials): Promise<Response> {
     try {
       const { userId, credentialRecordId } = w3cCredential;
-      const [baseWalletDetails, getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
-  
+      const [getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
+           
       const {tenantId} = getTenant;
-  
-      const { agentEndpoint } = baseWalletDetails;
+      const { agentEndpoint } = getTenant;
 
       const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_W3C_CREDENTIAL}${tenantId}/${credentialRecordId}`;
 
