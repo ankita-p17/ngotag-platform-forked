@@ -566,7 +566,16 @@ export class OrganizationService {
     payload.client_secret = clientSecret;
 
     try {
+      // eslint-disable-next-line no-console
+      console.log(`Request on authenticateClientKeycloak with payload: ${JSON.stringify(payload)}`);
+      // eslint-disable-next-line no-console
+      console.log(`Payload size: ${Buffer.byteLength(JSON.stringify(payload), 'utf8')} bytes`);
       const mgmtTokenResponse = await this.clientRegistrationService.getToken(payload);
+      // eslint-disable-next-line no-console
+      console.log(`Response on authenticateClientKeycloak with payload: ${JSON.stringify(mgmtTokenResponse)}`);
+      // eslint-disable-next-line no-console
+      console.log(`Response size: ${Buffer.byteLength(JSON.stringify(mgmtTokenResponse), 'utf8')} bytes`);
+
       return mgmtTokenResponse;
     } catch (error) {
       throw new UnauthorizedException(ResponseMessages.organisation.error.invalidClient);
@@ -636,8 +645,13 @@ export class OrganizationService {
       const query = {
         id: orgId
       };
-
+      // eslint-disable-next-line no-console
+      console.log(`Request on getOrganization service with query: ${JSON.stringify(query)}`);
       const organizationDetails = await this.organizationRepository.getOrganization(query);
+      // eslint-disable-next-line no-console
+      console.log(`Response on getOrganization service: ${JSON.stringify(organizationDetails)}`);
+      // eslint-disable-next-line no-console
+      console.log(`Payload size: ${Buffer.byteLength(JSON.stringify(organizationDetails), 'utf8')} bytes`);
       return organizationDetails;
     } catch (error) {
       this.logger.error(`In create organization : ${JSON.stringify(error)}`);
