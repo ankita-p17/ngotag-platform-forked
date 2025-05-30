@@ -101,8 +101,6 @@ export class OrganizationController {
    */
   @MessagePattern({ cmd: 'get-organization-by-id' })
   async getOrganization(@Body() payload: { orgId: string; userId: string}): Promise<IGetOrgById> {
-    // eslint-disable-next-line no-console
-    console.log(`Request received on API getOrganization controller with payload: ${JSON.stringify(payload)}`);
     return this.organizationService.getOrganization(payload.orgId);
   }
 /**

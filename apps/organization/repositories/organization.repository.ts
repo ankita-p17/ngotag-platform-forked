@@ -391,20 +391,20 @@ export class OrganizationRepository {
             select: {
               id: true,
               orgDid: true,
-              didDocument: true,
+              // didDocument: true,
               walletName: true,
               agentEndPoint: true,
               agentSpinUpStatus: true,
               agentsTypeId: true,
               orgAgentTypeId: true,
               createDateTime: true,
-              agent_invitations: {
-                select: {
-                  id: true,
-                  connectionInvitation: true,
-                  multiUse: true
-                }
-              },
+              // agent_invitations: {
+              //   select: {
+              //     id: true,
+              //     connectionInvitation: true,
+              //     multiUse: true
+              //   }
+              // },
               org_agent_type: true,
               ledgers: {
                 select: {
