@@ -61,7 +61,7 @@ interface ISchema {
 }
 
 interface IOrgAgents {
-  agent_invitations: IAgentInvitation[];
+  agent_invitations?: IAgentInvitation[];
   ledgers: ILedgers;
   org_agent_type: IOrgAgentType;
 }
