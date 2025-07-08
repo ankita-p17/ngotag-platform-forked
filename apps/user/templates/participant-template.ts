@@ -1,4 +1,4 @@
-import { Attribute } from "../interfaces/user.interface";
+import { Attribute } from '../interfaces/user.interface';
 
 export class ParticipantTemplate {
   findAttributeByName(attributes: Attribute[], name: string): Attribute {

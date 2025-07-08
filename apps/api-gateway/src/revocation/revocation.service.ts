@@ -1,7 +1,10 @@
-import { Injectable, Inject, Logger, HttpException } from '@nestjs/common';
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable camelcase */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Injectable, Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { CreateRevocationRegistryDto } from '../dtos/create-revocation-registry.dto';
-import { map } from 'rxjs/operators';
 import { UpdateRevocationRegistryUriDto } from '../dtos/update-revocation-registry.dto';
 import { BaseService } from 'libs/service/base.service';
 

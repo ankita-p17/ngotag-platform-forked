@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-duplicate-enum-values */
 export enum CommonConstants {
   // Error and Success Responses from POST and GET calls
   RESP_ERR_HTTP_INVALID_HEADER_VALUE = 'ERR_HTTP_INVALID_HEADER_VALUE',
@@ -326,8 +327,8 @@ export enum CommonConstants {
   ROLE = 'endorser',
 
  //CacheInfo
-CACHE_SHARED_APIKEY_KEY = "dedicatedApiKey",
-CACHE_APIKEY_KEY = "sharedApiKey",
+CACHE_SHARED_APIKEY_KEY = 'dedicatedApiKey',
+CACHE_APIKEY_KEY = 'sharedApiKey',
 CACHE_TTL_SECONDS = 604800,
 
 CLOUD_WALLET_GET_PROOF_REQUEST = '/multi-tenancy/proofs',
