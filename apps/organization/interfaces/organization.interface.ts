@@ -244,3 +244,10 @@ export interface IOrgRoleDetails {
   lastChangedBy: string;
   deletedAt: Date;
 }
+
+export interface IVerificationMethod {
+  id: string;
+  type: string;
+  controller: string;
+  publicKeyBase58: string;
+}
