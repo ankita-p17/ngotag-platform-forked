@@ -87,7 +87,7 @@ export class AgentService extends BaseService {
         return this.sendNatsMessage(this.agentServiceProxy, 'delete-wallet', payload);
     }
 
-    async signData(data: unknown, orgId: string): Promise<AgentStatus> {
+    async signData(data: unknown, orgId: string): Promise<unknown> {
         const payload = { data, orgId };
         return this.sendNatsMessage(this.agentServiceProxy, 'sign-data-from-agent', payload);
     }

@@ -185,7 +185,7 @@ export class SignDataDto {
     enum: ['jsonLd', 'rawData']
   })
   @IsIn(['jsonLd', 'rawData'])
-  dataTypeToSign: 'jsonLd' | 'rawData';
+  dataTypeToSign: 'jsonLd' | 'rawData' = 'rawData';
 
   @ApiProperty({
     description: 'Store credential boolean if we want to credential after signing it',
