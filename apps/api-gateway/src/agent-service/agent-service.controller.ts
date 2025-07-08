@@ -21,8 +21,7 @@ import {
   ApiResponse,
   ApiOperation,
   ApiUnauthorizedResponse,
-  ApiForbiddenResponse,
-  ApiBearerAuth
+  ApiForbiddenResponse  
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 import { UnauthorizedErrorDto } from '../dtos/unauthorized-error.dto';
@@ -232,15 +231,12 @@ export class AgentController {
         description: ResponseMessages.errorMessages.badRequest
       });
     }
-
     const didDetails = await this.agentService.createDid(createDidDto, orgId, user);
-
     const finalResponse: IResponse = {
       statusCode: HttpStatus.CREATED,
       message: ResponseMessages.agent.success.createDid,
       data: didDetails
     };
-
     return res.status(HttpStatus.CREATED).json(finalResponse);
   }
 
