@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-duplicate-enum-values */
 export enum CommonConstants {
   // Error and Success Responses from POST and GET calls
   RESP_ERR_HTTP_INVALID_HEADER_VALUE = 'ERR_HTTP_INVALID_HEADER_VALUE',
@@ -122,6 +123,8 @@ export enum CommonConstants {
   URL_SHAGENT_DELETE_SUB_WALLET = '/multi-tenancy/#',
   URL_SHARED_SEND_BASIC_MESSAGE =  '/multi-tenancy/basic-messages/#/@',
   URL_SHAGENT_ACCEPT_PROOF_REQUEST = '/multi-tenancy/proofs/#/accept-request/@',
+  URL_SHARED_AGENT_SIGN_DATA = '/multi-tenancy/sign/#',
+  URL_SHARED_AGENT_VERIFY_SIGNED_DATA = '/multi-tenancy/verify/#',
 
   
   // PROOF SERVICES
@@ -326,8 +329,8 @@ export enum CommonConstants {
   ROLE = 'endorser',
 
  //CacheInfo
-CACHE_SHARED_APIKEY_KEY = "dedicatedApiKey",
-CACHE_APIKEY_KEY = "sharedApiKey",
+CACHE_SHARED_APIKEY_KEY = 'dedicatedApiKey',
+CACHE_APIKEY_KEY = 'sharedApiKey',
 CACHE_TTL_SECONDS = 604800,
 
 CLOUD_WALLET_GET_PROOF_REQUEST = '/multi-tenancy/proofs',
@@ -371,7 +374,11 @@ CLOUD_WALLET_SERVICE = 'cloud-wallet',
 //CLOUD WALLET
 RECEIVE_INVITATION_BY_URL = '/multi-tenancy/receive-invitation-url/',
 ACCEPT_OFFER = '/multi-tenancy/credentials/accept-offer/',
-SEED_LENGTH = 32
+SEED_LENGTH = 32,
+
+// sign data from agent
+URL_AGENT_SIGN_DATA = '/sign',
+URL_AGENT_VERIFY_SIGNED_DATA = '/verify',
 }
 
 export const ATTRIBUTE_NAME_REGEX = /\['(.*?)'\]/;

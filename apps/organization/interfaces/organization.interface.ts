@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from '@prisma/client';
 
 export interface IUserOrgRoles {
   id: string
@@ -243,4 +243,11 @@ export interface IOrgRoleDetails {
   lastChangedDateTime: Date;
   lastChangedBy: string;
   deletedAt: Date;
+}
+
+export interface IVerificationMethod {
+  id: string;
+  type: string;
+  controller: string;
+  publicKeyBase58: string;
 }

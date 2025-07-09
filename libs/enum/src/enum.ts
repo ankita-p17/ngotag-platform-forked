@@ -115,9 +115,9 @@ export enum NodeEnvironment {
 }
 
 export enum AutoAccept {
-    Always = "always",
-    ContentApproved = "contentApproved",
-    Never = "never"
+    Always = 'always',
+    ContentApproved = 'contentApproved',
+    Never = 'never'
 }
 
 export enum SortMembers {
