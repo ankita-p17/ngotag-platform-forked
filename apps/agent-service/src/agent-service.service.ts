@@ -1969,7 +1969,7 @@ export class AgentServiceService {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       if (dataTypeToSign === 'rawData' && rawPayload) {
         this.logger.debug(`updating raw data : diddoc[0].didDocument ${JSON.stringify(diddoc[0].didDocument)}`);
-        rawPayload.did = diddoc[0].didDocument.id;
+        rawPayload.did = diddoc[0].didDocument['id'];
         rawPayload.keyType = verificationMethod[0].type.toLowerCase().includes('ed25519') ? 'ed25519' : 'k256';
         this.logger.debug(`rawPayload.keyType is set as:: ${rawPayload.keyType}`);
       }
