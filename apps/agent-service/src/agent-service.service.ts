@@ -56,7 +56,7 @@ import {
   OrgDid,
   IBasicMessage
 } from './interface/agent-service.interface';
-import { AgentSpinUpStatus, AgentType, DidMethod, KeyType, Ledgers, OrgAgentType, PromiseResult } from '@credebl/enum/enum';
+import { AgentSpinUpStatus, AgentType, DidMethod, Ledgers, OrgAgentType, PromiseResult } from '@credebl/enum/enum';
 import { AgentServiceRepository } from './repositories/agent-service.repository';
 import { Prisma, RecordType, ledgers, org_agents, organisation, platform_config, user } from '@prisma/client';
 import { CommonConstants } from '@credebl/common/common.constant';
@@ -1969,7 +1969,7 @@ export class AgentServiceService {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       if (dataTypeToSign === 'rawData' && rawPayload) {
         rawPayload.publicKeyBase58 = rawPayload.publicKeyBase58 ? rawPayload.publicKeyBase58 : verificationMethod[0].publicKeyBase58;
-        rawPayload.keyType = diddoc[0].did.includes(KeyType.Ed25519) ? KeyType.Ed25519 : KeyType.K256;
+        rawPayload.keyType = diddoc[0].did.includes('ed25519') ? 'ed25519' : 'k256';
         this.logger.debug(`rawPayload.keyType is set as:: ${rawPayload.keyType}`);
       }
       const dataToSign = dataTypeToSign === 'jsonLd' ? credentialPayload : rawPayload;
