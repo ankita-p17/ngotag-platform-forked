@@ -2001,6 +2001,7 @@ export class AgentServiceService {
   async verifySignature(data: unknown, orgId: string): Promise<IAgentStatus> {
     try {
       // Get organization agent details
+      this.logger.debug(`In verifySignature service with data ::: ${JSON.stringify(data)}`);
       const orgAgentDetails: org_agents = await this.agentServiceRepository.getOrgAgentDetails(orgId);
       let agentApiKey;
       if (orgAgentDetails) {
