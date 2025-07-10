@@ -4,7 +4,6 @@ import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
   IsBoolean,
-  IsEnum,
   IsIn,
   IsISO8601,
   IsNotEmpty,
@@ -21,7 +20,6 @@ import {
   ValidatorConstraintInterface
 } from 'class-validator';
 import { CreateDidDto } from './create-did.dto';
-import { KeyType } from '@credebl/enum/enum';
 import { RewriteValidationOptions } from '@credebl/common/custom-overrideable-validation-pipe';
 import { BadRequestException } from '@nestjs/common';
 
@@ -155,9 +153,9 @@ export class SignRawDataDto {
   @IsString()
   data: string;
 
-  @ApiProperty({ enum: KeyType, enumName: 'KeyType' })
-  @IsEnum(KeyType, { message: 'keyType must be a valid KeyType value' })
-  keyType: KeyType;
+  @ApiProperty({ description: 'keyType either ed25519, x25519, k256 or p256' })
+  @IsString()
+  keyType: string;
 
   @ApiPropertyOptional({ description: 'Base58-encoded public key' })
   @IsOptional()
