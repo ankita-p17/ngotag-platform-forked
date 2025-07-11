@@ -76,7 +76,7 @@ import { InvitationMessage } from '@credebl/common/interfaces/agent-service.inte
 import * as CryptoJS from 'crypto-js';
 import { UserActivityRepository } from 'libs/user-activity/repositories';
 import { PrismaService } from '@credebl/prisma-service';
-import { SignDataDto } from 'apps/api-gateway/src/agent-service/dto/agent-service.dto';
+import { SignDataDto, VerifySignatureDto } from 'apps/api-gateway/src/agent-service/dto/agent-service.dto';
 import { IVerificationMethod } from 'apps/organization/interfaces/organization.interface';
 
 @Injectable()
@@ -1998,10 +1998,11 @@ export class AgentServiceService {
    * @param orgId
    * @returns agent status
    */
-  async verifySignature(data: unknown, orgId: string): Promise<IAgentStatus> {
+  async verifySignature(data: VerifySignatureDto, orgId: string): Promise<IAgentStatus> {
     try {
       // Get organization agent details
-      this.logger.debug(`In verifySignature service with data ::: ${JSON.stringify(data)}`);
+      delete data['orgId'];
+      this.logger.debug(`In agent-service to verifySignature with data ::: ${JSON.stringify(data)}`);
       const orgAgentDetails: org_agents = await this.agentServiceRepository.getOrgAgentDetails(orgId);
       let agentApiKey;
       if (orgAgentDetails) {
