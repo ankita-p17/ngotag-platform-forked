@@ -209,28 +209,49 @@ export class SignDataDto {
 
 export class VerifySignatureDto {
   @ApiProperty({
-    description: 'This is the signature to validate with the given key',
-    example: {
-      signature: 'signature to validate',
-      data: 'data corresponding to the signature',
-      keyType: 'keyType of used key',
-      publicKeyBase58: 'publicKeyBase58 of the signing authority'
-    }
+    type: String,
+    description: 'Data to verify for given signature',
+    example: 'test data'
   })
-  data: VerifyDataOptions;
+  data: string;
 
-  @ApiPropertyOptional({ default: false })
-  @IsOptional()
-  @IsBoolean()
-  verifyCredentialStatus?: boolean;
+  @ApiProperty({
+    type: String,
+    description: 'This is the signature to validate with the given key',
+    example: 'p256'
+  })
+  keyType?: string;
+  
+  @ApiProperty({
+    type: String,
+    description: 'Base58 of public key to verify the signature',
+    example: 'aSzvTBobJJoaBiwS9aGY76gkxqgNjqEmEvBiRQyBaee'
+  })
+  publicKeyBase58: string;
+
+  @ApiProperty({
+    type: String,
+    description: 'Signature to verify',
+    example: 'p52JT9PacBjIrv4Zia/RQBgT8OYGTC7dSek66pSIXQRX4ffv06wFBaQ=='
+  })
+  signature: string;
+
+  @ApiProperty({
+    type: String,
+    description: 'DID used during signature to verify the provided signature',
+    example: 'did:key:z6MkhbXESQ6QqSJZ7g9tzdag7gJ6voBonGnWsEVmvsUBmjfC'
+  })
+  did?: string;
+
+  @ApiProperty({
+    type: String,
+    description: 'DID Method',
+    example: 'Ed25519'
+  })
+  method?: string;
 }
 
 export interface IVerifySignature {
-  data: VerifyDataOptions;
-  verifyCredentialStatus?: boolean;
-}
-
-export type VerifyDataOptions = {
   data: string
   keyType?: string
   publicKeyBase58: string

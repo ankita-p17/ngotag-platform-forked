@@ -32,7 +32,7 @@ import { ForbiddenErrorDto } from '../dtos/forbidden-error.dto';
 import { ResponseMessages } from '@credebl/common/response-messages';
 import { AgentService } from './agent-service.service';
 import IResponseType, { IResponse } from '@credebl/common/interfaces/response.interface';
-import { AgentSpinupDto, IVerifySignature, SignDataDto } from './dto/agent-service.dto';
+import { AgentSpinupDto, IVerifySignature, SignDataDto, VerifySignatureDto } from './dto/agent-service.dto';
 import { Response } from 'express';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { user } from '@prisma/client';
@@ -367,13 +367,14 @@ export class AgentController {
    * @returns Get agent details
    */
   @ApiBody({
+    type: VerifySignatureDto,
     description:
       'Enter the data you would like to verify the signature for. It can be of type w3c jsonld credential or any type that needs to be verified'
   })
   @Post('/orgs/:orgId/agents/verify-signature')
   @ApiOperation({
     summary: 'Validates signed data from agent, including credentials',
-    description: 'Credentials or any other data signed by the organisation is validated'
+    description: 'Credentials or any other data signed by the organization is validated'
   })
   @UseGuards(AuthGuard('jwt'), OrgRolesGuard)
   @Roles(
@@ -390,6 +391,7 @@ export class AgentController {
     @Body() data: IVerifySignature,
     @Res() res: Response
   ): Promise<Response> {
+    this.logger.log(`[verifySignature] - verifying signature for orgId: ${orgId} with data ${JSON.stringify(data)}`);
     const agentData = await this.agentService.verifySignature(data, orgId);
     const finalResponse: IResponse = {
       statusCode: HttpStatus.OK,
