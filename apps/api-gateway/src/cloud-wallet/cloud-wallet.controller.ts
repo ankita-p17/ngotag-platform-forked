@@ -18,7 +18,7 @@ import { validateDid } from '@credebl/common/did.validator';
 import { CommonConstants } from '@credebl/common/common.constant';
 import { UserRoleGuard } from '../authz/guards/user-role.guard';
 import { AcceptProofRequestDto } from './dtos/accept-proof-request.dto';
-import { IBasicMessage, IConnectionDetailsById, ICredentialDetails, IGetCredentialsForRequest, IGetProofPresentation, IGetProofPresentationById, IProofPresentationPayloadWithCred, IProofPresentationDetails, IWalletDetailsForDidList, IW3cCredentials } from '@credebl/common/interfaces/cloud-wallet.interface';
+import { IBasicMessage, IConnectionDetailsById, ICredentialDetails, IGetCredentialsForRequest, IGetProofPresentation, IGetProofPresentationById, IProofPresentationPayloadWithCred, IProofPresentationDetails, IWalletDetailsForDidList, IW3cCredentials, ICheckCloudWalletStatus } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { CreateConnectionDto } from './dtos/create-connection.dto';
 import { ProofWithCredDto } from './dtos/accept-proof-request-with-cred.dto';
 import { DeclineProofRequestDto } from './dtos/decline-proof-request.dto';
@@ -96,6 +96,33 @@ export class CloudWalletController {
          return res.status(HttpStatus.CREATED).json(finalResponse);
  
      }
+    /**
+        * Check cloud wallet status 
+        * @returns success message
+    */
+    @Get('/check-cloud-wallet-status')
+    @ApiOperation({ summary: 'Accept proof request', description: 'Accept proof request' })
+    @ApiResponse({ status: HttpStatus.CREATED, description: 'Created', type: ApiResponseDto })
+    @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+    async checkCloudWalletStatus(
+        @Res() res: Response,
+        @User() user: user
+    ): Promise<Response> {
+        const { id, email } = user;
+        
+        const checkCloudWalletStatus : ICheckCloudWalletStatus = {
+            userId: id,
+            email
+        };
+
+        const checkCloudWalletStatusRes = await this.cloudWalletService.checkCloudWalletStatus(checkCloudWalletStatus);
+        const finalResponse: IResponse = {
+            statusCode: HttpStatus.OK,
+            message: ResponseMessages.cloudWallet.success.checkCloudWalletStatus,
+            data: checkCloudWalletStatusRes
+        };
+        return res.status(HttpStatus.CREATED).json(finalResponse);
+    }
 
      @Get('get-active-base-wallet')
      @ApiOperation({ summary: 'Create cloud wallet', description: 'Create cloud wallet' })

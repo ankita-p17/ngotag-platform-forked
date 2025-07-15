@@ -2,8 +2,7 @@
 import { Controller } from '@nestjs/common'; // Import the common service in the library
 import { CloudWalletService } from './cloud-wallet.service'; // Import the common service in connection module
 import { MessagePattern } from '@nestjs/microservices'; // Import the nestjs microservices package
-import { IAcceptOffer, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, ICreateCloudWallet, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, ICreateConnection, IConnectionInvitationResponse, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest, BaseAgentInfo, ISelfAttestedCredential, IW3cCredentials } from '@credebl/common/interfaces/cloud-wallet.interface';
-import { user as User } from '@prisma/client';
+import { IAcceptOffer, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, ICreateCloudWallet, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, ICreateConnection, IConnectionInvitationResponse, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest, BaseAgentInfo, ISelfAttestedCredential, IW3cCredentials, ICheckCloudWalletStatus } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { UpdateBaseWalletDto } from 'apps/api-gateway/src/cloud-wallet/dtos/cloudWallet.dto';
 
 @Controller()
@@ -18,6 +17,11 @@ export class CloudWalletController {
   @MessagePattern({ cmd: 'create-connection-by-holder' })
   async createConnection(createConnection: ICreateConnection): Promise<IConnectionInvitationResponse> {
     return this.cloudWalletService.createConnection(createConnection);
+  }
+
+  @MessagePattern({ cmd: 'check-cloud-wallet-status' })
+  async checkCloudWalletStatus(createConnection: ICheckCloudWalletStatus): Promise<IConnectionInvitationResponse> {
+    return this.cloudWalletService.checkCloudWalletStatus(createConnection);
   }
 
   @MessagePattern({ cmd: 'accept-proof-request-by-holder' })

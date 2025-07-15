@@ -527,6 +527,7 @@ export const ResponseMessages = {
       getBaseWalletInfo: 'Fetched base wallet info',
       configureBaseWallet: 'Successfully configure the base wallet.',
       acceptProofRequest: 'Proof request has been successfully accepted.',
+      checkCloudWalletStatus: 'Cloud wallet exists',
       declineProofRequest: 'Proof request has been successfully declined.',
       createConnection: 'Connection created successfully.',
       createSelfAttestedW3cCredential: 'Self-attested W3C credential created successfully',

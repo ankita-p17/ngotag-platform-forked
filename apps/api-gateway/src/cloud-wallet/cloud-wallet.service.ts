@@ -31,6 +31,12 @@ export class CloudWalletService extends BaseService {
     return this.sendNatsMessage(this.cloudWalletServiceProxy, 'configure-cloud-base-wallet', cloudBaseWalletConfigure);
   }
 
+    checkCloudWalletStatus(
+    acceptProofRequest: ICheckCloudWalletStatus
+  ): Promise<IProofRequestRes> {
+    return this.sendNatsMessage(this.cloudWalletServiceProxy, 'check-cloud-wallet-status', acceptProofRequest);
+  }
+
   createConnection(
     createConnection: ICreateConnection
   ): Promise<IConnectionInvitationResponse> {

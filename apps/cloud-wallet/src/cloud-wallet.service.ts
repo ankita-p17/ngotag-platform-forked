@@ -44,7 +44,7 @@ import {
   IDeclineProofRequest,
   BaseAgentInfo,
   ISelfAttestedCredential,
-  IW3cCredentials
+  ICheckCloudWalletStatus
 } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { CloudWalletRepository } from './cloud-wallet.repository';
 import { ResponseMessages } from '@credebl/common/response-messages';
@@ -105,6 +105,32 @@ export class CloudWalletService {
 
       const storedWalletInfo = await this.cloudWalletRepository.storeCloudWalletInfo(walletInfoToStore);
       return storedWalletInfo;
+    } catch (error) {
+      await this.commonService.handleError(error);
+      throw error;
+    }
+  }
+
+    /**
+   * Check cloud wallet status
+   * @param checkCloudWalletStatus 
+   * @returns connection details
+   */
+  async checkCloudWalletStatus(checkCloudWalletStatus: ICheckCloudWalletStatus): Promise<IConnectionInvitationResponse> {
+    try {
+
+      const { userId } = checkCloudWalletStatus;
+        const [getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
+
+        delete checkCloudWalletStatus.email;
+
+        const { tenantId } = getTenant;
+        const { agentEndpoint } = getTenant;
+
+        const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_CHECK_CLOUD_WALLET_EXISTS}/${tenantId}`;
+        
+        const checkCloudWalletExists = await this.commonService.httpGet(url, { headers: { authorization: decryptedApiKey } });       
+        return checkCloudWalletExists;
     } catch (error) {
       await this.commonService.handleError(error);
       throw error;
@@ -349,27 +375,21 @@ export class CloudWalletService {
   
       const baseWalletDetails = await this.cloudWalletRepository.getCloudWalletDetails(CloudWalletType.BASE_WALLET);
 
-      if (baseWalletDetails.useCount >= baseWalletDetails.maxSubWallets) {
-        await this.cloudWalletRepository.UpdateCloudWalletDetails({
-          id: baseWalletDetails.id
-        },
-        {
-          isActive : false
-        }
-      );
-
+      if (!baseWalletDetails) {
       throw new InternalServerErrorException(ResponseMessages.cloudWallet.error.BaseWalletLimitExceeded, {
         cause: new Error(),
         description: ResponseMessages.errorMessages.serverError
       });
       } else {
-        await this.cloudWalletRepository.UpdateCloudWalletDetails({
+        const lastSubWallet: boolean = baseWalletDetails.useCount >= baseWalletDetails.maxSubWallets - 1;
+        await this.cloudWalletRepository.updateCloudWalletDetails({
           id: baseWalletDetails.id
         },
         {
           useCount : {
             increment: 1
-          }
+          },
+          ...(lastSubWallet && { isActive : false })
         }
       );
       }

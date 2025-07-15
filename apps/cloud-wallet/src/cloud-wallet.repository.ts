@@ -16,9 +16,9 @@ export class CloudWalletRepository {
 
  
   // eslint-disable-next-line camelcase
-  async getCloudWalletDetails(type: CloudWalletType): Promise<cloud_wallet_user_info> {
+  async getCloudWalletDetails(type: CloudWalletType): Promise<cloud_wallet_user_info | null> {
     try {
-      const agentDetails = await this.prisma.cloud_wallet_user_info.findFirstOrThrow({
+      const agentDetails = await this.prisma.cloud_wallet_user_info.findFirst({
         where: {
           type,
           isActive:true
