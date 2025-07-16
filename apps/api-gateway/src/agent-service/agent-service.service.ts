@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { user } from '@prisma/client';
 import { BaseService } from 'libs/service/base.service';
-import { AgentSpinupDto } from './dto/agent-service.dto';
+import { AgentSpinupDto, IVerifySignature } from './dto/agent-service.dto';
 import { CreateTenantDto } from './dto/create-tenant.dto';
 import { AgentSpinUpSatus, IWalletRecord } from './interface/agent-service.interface';
 import { AgentStatus } from './interface/agent-service.interface';
@@ -92,7 +92,7 @@ export class AgentService extends BaseService {
         return this.sendNatsMessage(this.agentServiceProxy, 'sign-data-from-agent', payload);
     }
     
-    async verifySignature(data: unknown, orgId: string): Promise<AgentStatus> {
+    async verifySignature(data: IVerifySignature, orgId: string): Promise<AgentStatus> {
         const payload = { data, orgId };
         return this.sendNatsMessage(this.agentServiceProxy, 'verify-signature-from-agent', payload);
     }

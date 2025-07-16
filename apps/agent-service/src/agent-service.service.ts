@@ -76,7 +76,7 @@ import { InvitationMessage } from '@credebl/common/interfaces/agent-service.inte
 import * as CryptoJS from 'crypto-js';
 import { UserActivityRepository } from 'libs/user-activity/repositories';
 import { PrismaService } from '@credebl/prisma-service';
-import { SignDataDto } from 'apps/api-gateway/src/agent-service/dto/agent-service.dto';
+import { SignDataDto, VerifySignatureDto } from 'apps/api-gateway/src/agent-service/dto/agent-service.dto';
 import { IVerificationMethod } from 'apps/organization/interfaces/organization.interface';
 
 @Injectable()
@@ -1968,8 +1968,9 @@ export class AgentServiceService {
 
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       if (dataTypeToSign === 'rawData' && rawPayload) {
-        rawPayload.publicKeyBase58 = rawPayload.publicKeyBase58 ? rawPayload.publicKeyBase58 : verificationMethod[0].publicKeyBase58;
-        rawPayload.keyType = diddoc[0].did.includes('ed25519') ? 'ed25519' : 'k256';
+        this.logger.debug(`updating raw data : diddoc[0].didDocument ${JSON.stringify(diddoc[0].didDocument)}`);
+        rawPayload.did = diddoc[0].didDocument['id'];
+        rawPayload.keyType = verificationMethod[0].type.toLowerCase().includes('ed25519') ? 'ed25519' : 'k256';
         this.logger.debug(`rawPayload.keyType is set as:: ${rawPayload.keyType}`);
       }
       const dataToSign = dataTypeToSign === 'jsonLd' ? credentialPayload : rawPayload;
@@ -1997,9 +1998,11 @@ export class AgentServiceService {
    * @param orgId
    * @returns agent status
    */
-  async verifySignature(data: unknown, orgId: string): Promise<IAgentStatus> {
+  async verifySignature(data: VerifySignatureDto, orgId: string): Promise<IAgentStatus> {
     try {
       // Get organization agent details
+      delete data['orgId'];
+      this.logger.debug(`In agent-service to verifySignature with data ::: ${JSON.stringify(data)}`);
       const orgAgentDetails: org_agents = await this.agentServiceRepository.getOrgAgentDetails(orgId);
       let agentApiKey;
       if (orgAgentDetails) {

@@ -26,7 +26,7 @@ import {
 import { user } from '@prisma/client';
 import { InvitationMessage } from '@credebl/common/interfaces/agent-service.interface';
 import { AgentSpinUpStatus } from '@credebl/enum/enum';
-import { SignDataDto } from 'apps/api-gateway/src/agent-service/dto/agent-service.dto';
+import { SignDataDto, VerifySignatureDto } from 'apps/api-gateway/src/agent-service/dto/agent-service.dto';
 
 @Controller()
 export class AgentServiceController {
@@ -315,7 +315,7 @@ export class AgentServiceController {
    * @returns Get agent health
    */
   @MessagePattern({ cmd: 'verify-signature-from-agent' })
-  async verifysignature(payload: { data: unknown; orgId: string }): Promise<unknown> {
+  async verifySignature(payload: { data: VerifySignatureDto; orgId: string }): Promise<unknown> {
     return this.agentServiceService.verifySignature(payload.data, payload.orgId);
   }
 }
