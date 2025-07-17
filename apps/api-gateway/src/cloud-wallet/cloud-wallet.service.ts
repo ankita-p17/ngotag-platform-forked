@@ -1,8 +1,9 @@
 
-import { IAcceptOffer, ICreateCloudWallet, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, ICreateConnection, IConnectionInvitationResponse, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest, BaseAgentInfo, IW3cCredentials } from '@credebl/common/interfaces/cloud-wallet.interface';
+import { IAcceptOffer, ICreateCloudWallet, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, ICreateConnection, IConnectionInvitationResponse, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest, BaseAgentInfo, IW3cCredentials, IDeleteCloudWallet, IExportCloudWallet, ICheckCloudWalletStatus } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { Inject, Injectable} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { user } from '@prisma/client';
+// eslint-disable-next-line camelcase
+import { cloud_wallet_user_info, user } from '@prisma/client';
 // import { Prisma } from '@prisma/client';
 import { BaseService } from 'libs/service/base.service';
 import { UpdateBaseWalletDto } from './dtos/cloudWallet.dto';
@@ -81,6 +82,27 @@ export class CloudWalletService extends BaseService {
     cloudWalletDetails: ICreateCloudWallet
   ): Promise<IStoredWalletDetails> {
     return this.sendNatsMessage(this.cloudWalletServiceProxy, 'create-cloud-wallet', cloudWalletDetails);
+  }
+
+  async deleteCloudWallet(
+    cloudWalletDetails: IDeleteCloudWallet
+  // eslint-disable-next-line camelcase
+  ): Promise<cloud_wallet_user_info> {
+    // eslint-disable-next-line camelcase
+    const res: cloud_wallet_user_info = await this.sendNatsMessage(this.cloudWalletServiceProxy, 'delete-cloud-wallet', cloudWalletDetails);
+    if (cloudWalletDetails.deleteHolder) {
+      await this.sendNatsMessage(this.cloudWalletServiceProxy, 'delete-user', res.userId);
+    }
+    return res;
+  }
+
+    async ExportCloudWallet(
+    cloudWalletDetails: IExportCloudWallet
+  // eslint-disable-next-line camelcase
+  ): Promise<cloud_wallet_user_info> {
+    // eslint-disable-next-line camelcase
+    const res: cloud_wallet_user_info = await this.sendNatsMessage(this.cloudWalletServiceProxy, 'export-cloud-wallet', cloudWalletDetails);
+    return res;
   }
 
   getBaseWalletDetails(user: user): Promise<BaseAgentInfo[]> {
