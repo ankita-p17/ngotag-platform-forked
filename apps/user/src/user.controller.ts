@@ -207,6 +207,12 @@ export class UserController {
     return this.userService.getUserActivity(payload.userId, payload.limit);
   }
 
+  // Delete user
+  @MessagePattern({ cmd: 'delete-user' })
+  async deleteUser(userId: string): Promise<object> {
+    return this.userService.deleteUser(userId);
+  }
+
   @MessagePattern({ cmd: 'add-passkey' })
   async addPasskey(payload: { userEmail: string, userInfo: AddPasskeyDetailsDto }): Promise<string | object> {
     return this.userService.addPasskey(payload.userEmail, payload.userInfo);

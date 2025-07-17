@@ -68,6 +68,15 @@ export class UserRepository {
     }
   }
 
+  deleteUser(userId:string): Promise<user> {
+
+     return this.prisma.user.delete({
+        where:{
+          id: userId
+        }
+      });
+  }
+
 
   async createUserWithoutVerification(user: IUserInformationUsernameBased): Promise<user> {
     try {
@@ -84,7 +93,7 @@ export class UserRepository {
 
       return saveResponse;
     } catch (error) {
-      this.logger.error(`In Create User Repository: ${JSON.stringify(error)}`);
+      this.logger.error(`In Create User Repository------: ${JSON.stringify(error)}`);
       throw error;
     }
   }

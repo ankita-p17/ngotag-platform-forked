@@ -523,6 +523,7 @@ export const ResponseMessages = {
   cloudWallet: {
     success: {
       create: 'Cloud wallet created successfully',
+      delete: 'Cloud wallet deleted successfully',
       receive:'Received invitation successfully',
       getBaseWalletInfo: 'Fetched base wallet info',
       configureBaseWallet: 'Successfully configure the base wallet.',

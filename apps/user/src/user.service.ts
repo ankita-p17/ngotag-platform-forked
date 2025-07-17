@@ -403,6 +403,15 @@ export class UserService {
     }
   }
 
+  async deleteUser(userId:string): Promise<object> {
+
+    const res = await this.userRepository.deleteUser(userId);
+
+    const token = await this.clientRegistrationService.getManagementToken(res.clientId, res.clientSecret);
+    return this.clientRegistrationService.deleteUser(res.keycloakUserId, process.env.KEYCLOAK_REALM, token);
+
+  }
+
   async addPasskey(email: string, userInfo: AddPasskeyDetailsDto): Promise<string> {
     try {
       if (!email.toLowerCase()) {

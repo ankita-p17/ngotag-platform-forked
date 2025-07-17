@@ -96,6 +96,67 @@ export class CloudWalletController {
          return res.status(HttpStatus.CREATED).json(finalResponse);
  
      }
+
+    // /**
+    //     * Delete cloud wallet 
+    //     * @param res 
+    //     * @returns Success message
+    // */
+    //  @Delete('/delete-wallet')
+    //  @ApiOperation({ summary: 'Create cloud wallet', description: 'Create cloud wallet' })
+    //  @ApiResponse({ status: HttpStatus.CREATED, description: 'Created', type: ApiResponseDto })
+    //  @ApiBearerAuth()
+    //  @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+    //  async deleteCloudWallet(
+    //      @Res() res: Response,
+    //      @User() user: user,
+    //      @Query('deleteHolder') deleteHolder: boolean = false
+    //  ): Promise<Response> {
+    //      const {id} = user;
+
+    //      const cloudWalletDetails: IDeleteCloudWallet = {
+    //         userId: id,
+    //         deleteHolder
+    //      };
+
+    //     await this.cloudWalletService.deleteCloudWallet(cloudWalletDetails);
+    //     const finalResponse: IResponse = {
+    //          statusCode: HttpStatus.OK,
+    //          message: ResponseMessages.cloudWallet.success.delete
+    //      };
+    //      return res.status(HttpStatus.OK).json(finalResponse);
+ 
+    //  }
+
+         /**
+        * Delete cloud wallet 
+        * @param res 
+        * @returns Success message
+    */
+     @Post('/export-wallet')
+     @ApiOperation({ summary: 'Create cloud wallet', description: 'Create cloud wallet' })
+     @ApiResponse({ status: HttpStatus.CREATED, description: 'Created', type: ApiResponseDto })
+     @ApiBearerAuth()
+     @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+     async exportCloudWallet(
+         @Res() res: Response,
+         @User() user: user
+     ): Promise<Response> {
+        //  const {id} = user;
+
+        //  const cloudWalletDetails: IExportCloudWallet = {
+        //     userId: id
+        //  };
+
+        // await this.cloudWalletService.deleteCloudWallet(cloudWalletDetails);
+        const finalResponse: IResponse = {
+             statusCode: HttpStatus.OK,
+             message: ResponseMessages.cloudWallet.success.delete
+         };
+         return res.status(HttpStatus.OK).json(finalResponse);
+ 
+     }
+
     /**
         * Check cloud wallet status 
         * @returns success message

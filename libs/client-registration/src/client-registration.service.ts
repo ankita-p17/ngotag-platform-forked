@@ -175,6 +175,19 @@ export class ClientRegistrationService {
     };
   }
 
+  async deleteUser(
+    userId: string,
+    realm: string,
+    token: string
+  ): Promise<object> {
+    const url = `${await this.keycloakUrlService.createUserURL(realm)}/${userId}`;
+    const deleteUser = await this.commonService.httpDelete(
+       url,
+      this.getAuthHeader(token)
+    );
+    return deleteUser;
+  }
+
   async resetPasswordOfKeycloakUser(
     realm: string,
     resetPasswordValue: string,

@@ -52,6 +52,7 @@ import { CommonConstants } from '@credebl/common/common.constant';
     UserActivityService,
     UserActivityRepository,
     UserDevicesRepository
-  ]
+  ],
+  exports: [ClientRegistrationService]
 })
 export class UserModule {}

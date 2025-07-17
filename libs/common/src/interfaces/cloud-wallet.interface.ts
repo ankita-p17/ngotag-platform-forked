@@ -9,6 +9,18 @@ export class ICreateCloudWallet {
     userId?: string;
   }
 
+  export class IDeleteCloudWallet {
+    email?: string;
+    userId?: string;
+    deleteHolder: boolean;
+  }
+
+  export class IExportCloudWallet {
+    email?: string;
+    userId?: string;
+    deleteHolder: boolean;
+  }
+
 export interface ICloudWalletDetails {
     label: string;
     tenantId: string;

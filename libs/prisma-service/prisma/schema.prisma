@@ -89,7 +89,7 @@ model user_org_roles {
   idpRoleId    String?       @db.Uuid
   organisation organisation? @relation(fields: [orgId], references: [id])
   orgRole      org_roles     @relation(fields: [orgRoleId], references: [id])
-  user         user          @relation(fields: [userId], references: [id])
+  user         user          @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model organisation {
@@ -603,7 +603,7 @@ enum UserRole {
 model user_role_mapping {
   id         String    @id @default(uuid()) @db.Uuid
   userId     String    @db.Uuid
-  user       user      @relation(fields: [userId], references: [id])
+  user       user      @relation(fields: [userId], references: [id], onDelete: Cascade)
   userRoleId String    @db.Uuid
   user_role  user_role @relation(fields: [userRoleId], references: [id])
 }
