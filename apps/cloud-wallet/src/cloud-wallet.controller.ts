@@ -3,6 +3,8 @@ import { Controller } from '@nestjs/common'; // Import the common service in the
 import { CloudWalletService } from './cloud-wallet.service'; // Import the common service in connection module
 import { MessagePattern } from '@nestjs/microservices'; // Import the nestjs microservices package
 import { IAcceptOffer, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, ICreateCloudWallet, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, ICreateConnection, IConnectionInvitationResponse, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest, BaseAgentInfo, ISelfAttestedCredential, IW3cCredentials, ICheckCloudWalletStatus } from '@credebl/common/interfaces/cloud-wallet.interface';
+// eslint-disable-next-line camelcase
+import { cloud_wallet_user_info, user as User } from '@prisma/client';
 import { UpdateBaseWalletDto } from 'apps/api-gateway/src/cloud-wallet/dtos/cloudWallet.dto';
 
 @Controller()
@@ -58,6 +60,19 @@ export class CloudWalletController {
   async createConnectionInvitation(cloudWalletDetails: ICreateCloudWallet): Promise<IStoredWalletDetails> {
     return this.cloudWalletService.createCloudWallet(cloudWalletDetails);
   }
+  
+    @MessagePattern({ cmd: 'delete-cloud-wallet' })
+  // eslint-disable-next-line camelcase
+  async deleteCloudWallet(cloudWalletDetails: IDeleteCloudWallet): Promise<cloud_wallet_user_info> {
+    return this.cloudWalletService.deleteCloudWallet(cloudWalletDetails);
+  }
+
+
+  // @MessagePattern({ cmd: 'export-cloud-wallet' })
+  // // eslint-disable-next-line camelcase
+  // async exportCloudWallet(cloudWalletDetails: IExportCloudWallet): Promise<cloud_wallet_user_info> {
+  //   return this.cloudWalletService.exportCloudWallet(cloudWalletDetails);
+  // }
 
   @MessagePattern({ cmd: 'get-base-wallet-details' })
   async getBaseWalletDetails(user:User): Promise<BaseAgentInfo[]> {

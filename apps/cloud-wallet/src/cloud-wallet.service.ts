@@ -44,14 +44,17 @@ import {
   IDeclineProofRequest,
   BaseAgentInfo,
   ISelfAttestedCredential,
+  IW3cCredentials,
+  IDeleteCloudWallet,
   ICheckCloudWalletStatus
 } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { CloudWalletRepository } from './cloud-wallet.repository';
 import { ResponseMessages } from '@credebl/common/response-messages';
 import { CloudWalletType } from '@credebl/enum/enum';
 import { CommonConstants } from '@credebl/common/common.constant';
-import { user } from '@prisma/client';
+import { cloud_wallet_user_info, user } from '@prisma/client';
 import { UpdateBaseWalletDto } from 'apps/api-gateway/src/cloud-wallet/dtos/cloudWallet.dto';
+// import { ClientRegistrationService } from '@credebl/client-registration';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const md5 = require('md5');
 
@@ -443,6 +446,72 @@ export class CloudWalletService {
       await this.commonService.handleError(error);
     }
   }
+
+    /**
+   * Create clous wallet
+   * @param cloudWalletDetails
+   * @returns cloud wallet details
+   */
+  async deleteCloudWallet(cloudWalletDetails: IDeleteCloudWallet): Promise<cloud_wallet_user_info> {
+    try {
+      const { userId } = cloudWalletDetails;
+
+      const [getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
+  
+      const { tenantId } = getTenant;
+      const { agentEndpoint } = getTenant;
+  
+      const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_DELETE_BY_TENANT_ID}${tenantId}`;
+  
+      await this.commonService.httpDelete(url, { headers: { authorization: decryptedApiKey } });
+
+      const res = await this.cloudWalletRepository.deleteCloudSubWallet(userId);
+  
+      return res;
+    } catch (error) {
+      this.logger.error(`[createCloudWallet] - error in create cloud wallet: ${error}`);
+      await this.commonService.handleError(error);
+    }
+  }
+
+  // async exportCloudWallet(cloudWalletDetails: IExportCloudWallet): Promise<cloud_wallet_user_info> {
+  //   try {
+
+  //     const { agentEndpoint, agentApiKey } = baseWalletDetails;
+  //     const url = `${agentEndpoint}${CommonConstants.URL_SHAGENT_CREATE_TENANT}`;
+  //     const decryptedApiKey = await this.commonService.decryptPassword(agentApiKey);
+
+  //     const createCloudWalletResponse = await this.commonService.httpPost(url, agentPayload, {
+  //       headers: { authorization: decryptedApiKey }
+  //     });
+
+  //     if (!createCloudWalletResponse && !createCloudWalletResponse.id) {
+  //       throw new InternalServerErrorException(ResponseMessages.cloudWallet.error.createCloudWallet, {
+  //         cause: new Error(),
+  //         description: ResponseMessages.errorMessages.serverError
+  //       });
+  //     }
+
+  //     const cloudWalletResponse: ICloudWalletDetails = {
+  //       createdBy: userId,
+  //       label,
+  //       lastChangedBy: userId,
+  //       tenantId: createCloudWalletResponse.id,
+  //       type: CloudWalletType.SUB_WALLET,
+  //       userId,
+  //       agentApiKey,
+  //       agentEndpoint,
+  //       email,
+  //       key: walletKey,
+  //       connectionImageUrl
+  //     };
+  //     const storeCloudWalletDetails = await this.cloudWalletRepository.getCloudWalletInfo(cloudWalletResponse);
+  //     return storeCloudWalletDetails;
+  //   } catch (error) {
+  //     this.logger.error(`[createCloudWallet] - error in export cloud wallet: ${error}`);
+  //     await this.commonService.handleError(error);
+  //   }
+  // }
 
 
     /**

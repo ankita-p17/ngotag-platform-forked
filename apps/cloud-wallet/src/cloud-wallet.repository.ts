@@ -81,7 +81,7 @@ export class CloudWalletRepository {
     }
   }
 
-  async UpdateCloudWalletDetails(
+  async updateCloudWalletDetails(
     where: Prisma.cloud_wallet_user_infoWhereUniqueInput,
     data: Prisma.cloud_wallet_user_infoUpdateInput
   // eslint-disable-next-line camelcase
@@ -208,6 +208,25 @@ export class CloudWalletRepository {
     }
   }
 
+  // eslint-disable-next-line camelcase
+  async deleteCloudSubWallet(userId: string): Promise<cloud_wallet_user_info> {
+    try {
+
+
+          const res = this.prisma.cloud_wallet_user_info.delete({
+          where: {
+            userId
+          } 
+          });
+
+      
+      return res;
+    } catch (error) {
+      this.logger.error(`Error in getCloudSubWallet: ${error}`);
+      throw error;
+    }
+  }
+
   async getUserInfo(email: string): Promise<user> {
     try {
       const userDetails = await this.prisma.user.findUnique({
@@ -221,4 +240,5 @@ export class CloudWalletRepository {
       throw error;
     }
   }
+  
 }
