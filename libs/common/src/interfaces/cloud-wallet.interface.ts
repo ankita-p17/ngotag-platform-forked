@@ -120,6 +120,11 @@ export interface IAcceptProofRequest {
   comment?: string;
 }
 
+export interface ICheckCloudWalletStatus {
+  userId: string;
+  email: string;
+}
+
 export interface IDeclineProofRequest {
   proofRecordId: string;
   userId: string;
