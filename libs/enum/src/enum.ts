@@ -47,7 +47,8 @@ export enum DidMethod {
     INDY = 'indy',
     KEY = 'key',
     WEB = 'web',
-    POLYGON = 'polygon'
+    POLYGON = 'polygon',
+    ETHEREUM= 'ethereum'
 }
 
 export enum Ledgers {

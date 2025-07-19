@@ -143,6 +143,7 @@ export enum CommonConstants {
 
   // CREATE KEYS
   CREATE_POLYGON_SECP256k1_KEY = '/polygon/create-keys',
+  CREATE_ETH_KEY = '/ethereum/create-keys',
 
   // ENTITY NAMES
   ENTITY_NAME_TEMPLATE = 'templates',
