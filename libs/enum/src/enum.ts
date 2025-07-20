@@ -225,6 +225,7 @@ export enum W3CSchemaDataType {
 
 export enum JSONSchemaType {
     POLYGON_W3C = 'polygon',
+    ETHEREUM_W3C = 'ethr',
     LEDGER_LESS = 'no_ledger'
 }
 
