@@ -1,33 +1,36 @@
-# Stage 1: Build dependencies
+# Stage 1: Build the application with all dependencies
 FROM node:18-alpine3.18 as builder
 
-# Install dependencies required for the build
+# Install OS-level dependencies
 RUN apk add --no-cache --update postgresql-client openssl1.1-compat
+
+# Install pnpm
 RUN npm install -g pnpm --ignore-scripts
 
 WORKDIR /app
 
-# Copy only the files required to install dependencies
-COPY package.json pnpm-lock.yaml ./
-COPY libs/prisma-service/package.json ./libs/prisma-service/
+# Copy only the files required by pnpm to install dependencies for the entire monorepo
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
 
 # Install ALL monorepo dependencies based on the lockfile
+# This will install the correct version of Prisma CLI
 RUN pnpm i --frozen-lockfile
 
-# Stage 2: Create the final, lean image
+# Copy the rest of the source code
+COPY . .
+
+# Stage 2: Create the final, lean production image
 FROM node:18-alpine3.18
 
-# Install only runtime dependencies
+# Install only OS-level runtime dependencies
 RUN apk add --no-cache --update postgresql-client openssl1.1-compat
 
 WORKDIR /app
 
-# Copy installed dependencies from the builder stage
-COPY --from=builder /app/node_modules ./node_modules
+# Copy the specific service code and its dependencies from the builder stage
 COPY --from=builder /app/libs/prisma-service ./libs/prisma-service
+COPY --from=builder /app/node_modules ./node_modules
 
-# Copy the prisma schema and scripts
-COPY libs/prisma-service/prisma ./libs/prisma-service/prisma
-
-# Set the command to run the microservice
+# Set the command to run the seed script
+# This now runs inside a container with the correct dependencies and source code
 CMD ["sh", "-c", "cd libs/prisma-service && npx prisma migrate deploy && npx prisma db seed"]
