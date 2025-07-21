@@ -264,6 +264,27 @@ export class AgentController {
   }
 
   /**
+   * Create 
+   * @param orgId
+   * @returns Secp256k1 key pair for polygon DID
+   */
+  @Post('/orgs/:orgId/agents/ethereum/create-keys')
+  @UseGuards(AuthGuard('jwt'), OrgRolesGuard)
+  @Roles(OrgRoles.OWNER, OrgRoles.ADMIN, OrgRoles.PLATFORM_ADMIN, OrgRoles.ISSUER, OrgRoles.VERIFIER)
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Success', type: ApiResponseDto })
+  async createEthKeyPair(@Param('orgId') orgId: string, @Res() res: Response): Promise<Response> {
+    const didDetails = await this.agentService.createEthKeyPair(orgId);
+
+    const finalResponse: IResponse = {
+      statusCode: HttpStatus.CREATED,
+      message: ResponseMessages.agent.success.createKeys,
+      data: didDetails
+    };
+
+    return res.status(HttpStatus.CREATED).json(finalResponse);
+  }
+
+  /**
    * Configure the agent by organization
    * @param agentSpinupDto
    * @param user
