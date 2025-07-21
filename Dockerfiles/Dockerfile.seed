@@ -27,6 +27,9 @@ RUN apk add --no-cache --update postgresql-client openssl1.1-compat
 
 WORKDIR /app
 
+# Copy the root package.json so prisma can find its seed configuration
+COPY --from=builder /app/package.json ./
+
 # Copy the specific service code and its dependencies from the builder stage
 COPY --from=builder /app/libs/prisma-service ./libs/prisma-service
 COPY --from=builder /app/node_modules ./node_modules
