@@ -36,4 +36,4 @@ COPY --from=builder /app/node_modules ./node_modules
 
 # Set the command to run the seed script
 # This now runs inside a container with the correct dependencies and source code
-CMD ["sh", "-c", "cd libs/prisma-service && npx prisma migrate deploy && npx prisma db seed"]
+CMD ["sh", "-c", "npx prisma migrate deploy --schema=./libs/prisma-service/prisma/schema.prisma && npx prisma db seed"]
