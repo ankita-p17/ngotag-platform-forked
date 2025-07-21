@@ -19,9 +19,6 @@ RUN pnpm i --frozen-lockfile
 # Copy the rest of the source code
 COPY . .
 
-# Generate Prisma client
-RUN npx prisma generate --schema=./libs/prisma-service/prisma/schema.prisma
-
 # Stage 2: Create the final, lean production image
 FROM node:18-alpine3.18
 
@@ -42,5 +39,5 @@ COPY --from=builder /app/tsconfig.json ./
 COPY --from=builder /app/tsconfig.build.json ./
 
 # Set the command to run the seed script
-# Generate client again in case of architecture differences, then run migrations and seed
+# Generate client at runtime, then run migrations and seed
 CMD ["sh", "-c", "npx prisma generate --schema=./libs/prisma-service/prisma/schema.prisma && npx prisma migrate deploy --schema=./libs/prisma-service/prisma/schema.prisma && npx prisma db seed"]
