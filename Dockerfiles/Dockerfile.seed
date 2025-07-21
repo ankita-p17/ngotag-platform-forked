@@ -1,7 +1,7 @@
 # Stage 1: Build the application
 FROM node:18-alpine as build
 
-RUN apk add --no-cache postgresql-client openssl1.1-compat libc6-compat
+RUN apk add --no-cache postgresql-client
 RUN npm install -g pnpm --ignore-scripts
 WORKDIR /app
 COPY package.json ./
