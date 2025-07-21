@@ -136,7 +136,7 @@
       "indyNamespace": "polygon:testnet"
     },
     {
-      "name": "Ethereum Testnet",
+      "name": "Ethr Sepolia",
       "networkType": "sepolia",
       "poolConfig": "",
       "isActive": true,
@@ -145,7 +145,7 @@
       "indyNamespace": "ethr:sepolia"
     },
     {
-      "name": "Ethereum Mainnet",
+      "name": "Ethr Mainnet",
       "networkType": "mainnet",
       "poolConfig": "",
       "isActive": true,
