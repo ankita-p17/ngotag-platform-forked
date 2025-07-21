@@ -1,5 +1,5 @@
-# Stage 1: Build the application
-FROM node:18-alpine3.18 as build
+# Stage 1: Build dependencies
+FROM node:18-alpine3.18 as builder
 
 # Install dependencies required for the build
 RUN apk add --no-cache --update postgresql-client openssl1.1-compat
@@ -7,17 +7,27 @@ RUN npm install -g pnpm --ignore-scripts
 
 WORKDIR /app
 
-# Copy dependency definition files for pnpm
+# Copy only the files required to install dependencies
 COPY package.json pnpm-lock.yaml ./
+COPY libs/prisma-service/package.json ./libs/prisma-service/
 
-# Install ALL monorepo dependencies
+# Install ALL monorepo dependencies based on the lockfile
 RUN pnpm i --frozen-lockfile
 
-# Copy the rest of the source code
-COPY . .
+# Stage 2: Create the final, lean image
+FROM node:18-alpine3.18
 
-# Set permissions for scripts
-RUN chmod +x /app/libs/prisma-service/prisma/scripts/*.sh
+# Install only runtime dependencies
+RUN apk add --no-cache --update postgresql-client openssl1.1-compat
+
+WORKDIR /app
+
+# Copy installed dependencies from the builder stage
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/libs/prisma-service ./libs/prisma-service
+
+# Copy the prisma schema and scripts
+COPY libs/prisma-service/prisma ./libs/prisma-service/prisma
 
 # Set the command to run the microservice
-CMD ["sh", "-c", "cd libs/prisma-service && npx prisma generate && npx prisma migrate deploy && npx prisma db seed"]
+CMD ["sh", "-c", "cd libs/prisma-service && npx prisma migrate deploy && npx prisma db seed"]
