@@ -8,7 +8,7 @@ RUN npm install -g pnpm --ignore-scripts
 WORKDIR /app
 
 # Copy dependency definition files for pnpm
-COPY package.json pnpm-lock.yaml .npmrc ./
+COPY package.json pnpm-lock.yaml ./
 
 # Install ALL monorepo dependencies
 RUN pnpm i --frozen-lockfile
