@@ -10,7 +10,7 @@ RUN npm install -g pnpm --ignore-scripts
 WORKDIR /app
 
 # Copy only the files required by pnpm to install dependencies for the entire monorepo
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY package.json pnpm-lock.yaml ./
 
 # Install ALL monorepo dependencies based on the lockfile
 # This will install the correct version of Prisma CLI
