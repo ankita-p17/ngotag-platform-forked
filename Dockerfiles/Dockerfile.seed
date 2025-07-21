@@ -1,23 +1,23 @@
 # Stage 1: Build the application
 FROM node:18-alpine3.18 as build
-#FROM node:18-alpine as build
 
+# Install dependencies required for the build
 RUN apk add --no-cache --update postgresql-client openssl1.1-compat
 RUN npm install -g pnpm --ignore-scripts
+
 WORKDIR /app
-COPY package.json ./
 
-# Install dependencies
-RUN pnpm i
+# Copy dependency definition files for pnpm
+COPY package.json pnpm-lock.yaml .npmrc ./
 
+# Install ALL monorepo dependencies
+RUN pnpm i --frozen-lockfile
+
+# Copy the rest of the source code
 COPY . .
 
-
-# Set permissions
-RUN chmod 777 /app/libs/prisma-service/prisma/scripts
-RUN chmod +x /app/libs/prisma-service/prisma/scripts/geo_location_data_import.sh
-RUN chmod +x /app/libs/prisma-service/prisma/scripts/update_client_credential_data.sh
-
+# Set permissions for scripts
+RUN chmod +x /app/libs/prisma-service/prisma/scripts/*.sh
 
 # Set the command to run the microservice
 CMD ["sh", "-c", "cd libs/prisma-service && npx prisma generate && npx prisma migrate deploy && npx prisma db seed"]
