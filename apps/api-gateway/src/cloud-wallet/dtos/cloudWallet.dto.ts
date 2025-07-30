@@ -193,6 +193,21 @@ export class ReceiveInvitationUrlDTO {
     userId?: string;
 }
 
+  export class ExportCloudWalletDto {
+
+
+    @ApiPropertyOptional({ example: 'XzFjo1RTZ2h9UVFCnPUyaQ' })
+    @Transform(({ value }) => trim(value))
+    @IsNotEmpty({ message: 'passKey is required' })
+    @IsString({ message: 'passKey must be in string format.' })
+    passKey: string;
+
+
+    email: string;
+    
+    userId: string;
+}
+
 export class CredentialListDto {
   @ApiProperty({ required: false})
   @IsNotEmpty()

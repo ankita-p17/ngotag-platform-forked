@@ -15,12 +15,6 @@ export class ICreateCloudWallet {
     deleteHolder: boolean;
   }
 
-  export class IExportCloudWallet {
-    email?: string;
-    userId?: string;
-    deleteHolder: boolean;
-  }
-
 export interface ICloudWalletDetails {
     label: string;
     tenantId: string;
@@ -490,4 +484,10 @@ export interface IW3cCredentials {
   userId: string;
   email: string;
   credentialRecordId?: string;
+}
+
+export interface IExportCloudWallet {
+  passKey: string;
+  userId: string;
+  email: string;
 }
