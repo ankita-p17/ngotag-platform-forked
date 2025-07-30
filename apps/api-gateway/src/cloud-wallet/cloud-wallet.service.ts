@@ -96,14 +96,6 @@ export class CloudWalletService extends BaseService {
     return res;
   }
 
-    async ExportCloudWallet(
-    cloudWalletDetails: IExportCloudWallet
-  // eslint-disable-next-line camelcase
-  ): Promise<cloud_wallet_user_info> {
-    // eslint-disable-next-line camelcase
-    const res: cloud_wallet_user_info = await this.sendNatsMessage(this.cloudWalletServiceProxy, 'export-cloud-wallet', cloudWalletDetails);
-    return res;
-  }
 
   getBaseWalletDetails(user: user): Promise<BaseAgentInfo[]> {
     return this.sendNatsMessage(this.cloudWalletServiceProxy, 'get-base-wallet-details', user);
@@ -125,9 +117,13 @@ export class CloudWalletService extends BaseService {
     return this.sendNatsMessage(this.cloudWalletServiceProxy, 'accept-credential-offer', acceptOfferDetails);
   }
 
-   createDid(createDidDetails: ICreateCloudWalletDid): Promise<Response> {
-    return this.sendNatsMessage(this.cloudWalletServiceProxy, 'create-cloud-wallet-did', createDidDetails);
-}
+  createDid(createDidDetails: ICreateCloudWalletDid): Promise<Response> {
+  return this.sendNatsMessage(this.cloudWalletServiceProxy, 'create-cloud-wallet-did', createDidDetails);
+  }
+
+  exportWallet(exportWallet: IExportCloudWallet): Promise<Response> {
+  return this.sendNatsMessage(this.cloudWalletServiceProxy, 'export-cloud-wallet', exportWallet);
+  }
 
 getDidList(
   walletDetails: IWalletDetailsForDidList

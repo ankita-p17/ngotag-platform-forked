@@ -5,7 +5,7 @@ import { ApiBearerAuth, ApiForbiddenResponse, ApiOperation, ApiQuery, ApiRespons
 import { ForbiddenErrorDto } from '../dtos/forbidden-error.dto';
 import { UnauthorizedErrorDto } from '../dtos/unauthorized-error.dto';
 import { CloudWalletService } from './cloud-wallet.service';
-import { AcceptOfferDto, BasicMessageDTO, CreateCloudWalletDidDto, CreateCloudWalletDto, CredentialListDto, GetAllCloudWalletConnectionsDto, ReceiveInvitationUrlDTO, UpdateBaseWalletDto } from './dtos/cloudWallet.dto';
+import { AcceptOfferDto, BasicMessageDTO, CreateCloudWalletDidDto, CreateCloudWalletDto, CredentialListDto, ExportCloudWalletDto, GetAllCloudWalletConnectionsDto, ReceiveInvitationUrlDTO, UpdateBaseWalletDto } from './dtos/cloudWallet.dto';
 import { Response } from 'express';
 import { CustomExceptionFilter } from 'apps/api-gateway/common/exception-handler';
 import { ApiResponseDto } from '../dtos/apiResponse.dto';
@@ -18,7 +18,7 @@ import { validateDid } from '@credebl/common/did.validator';
 import { CommonConstants } from '@credebl/common/common.constant';
 import { UserRoleGuard } from '../authz/guards/user-role.guard';
 import { AcceptProofRequestDto } from './dtos/accept-proof-request.dto';
-import { IBasicMessage, IConnectionDetailsById, ICredentialDetails, IGetCredentialsForRequest, IGetProofPresentation, IGetProofPresentationById, IProofPresentationPayloadWithCred, IProofPresentationDetails, IWalletDetailsForDidList, IW3cCredentials, ICheckCloudWalletStatus } from '@credebl/common/interfaces/cloud-wallet.interface';
+import { IBasicMessage, IConnectionDetailsById, ICredentialDetails, IGetCredentialsForRequest, IGetProofPresentation, IGetProofPresentationById, IProofPresentationPayloadWithCred, IProofPresentationDetails, IWalletDetailsForDidList, IW3cCredentials, ICheckCloudWalletStatus, IDeleteCloudWallet } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { CreateConnectionDto } from './dtos/create-connection.dto';
 import { ProofWithCredDto } from './dtos/accept-proof-request-with-cred.dto';
 import { DeclineProofRequestDto } from './dtos/decline-proof-request.dto';
@@ -97,58 +97,29 @@ export class CloudWalletController {
  
      }
 
-    // /**
-    //     * Delete cloud wallet 
-    //     * @param res 
-    //     * @returns Success message
-    // */
-    //  @Delete('/delete-wallet')
-    //  @ApiOperation({ summary: 'Create cloud wallet', description: 'Create cloud wallet' })
-    //  @ApiResponse({ status: HttpStatus.CREATED, description: 'Created', type: ApiResponseDto })
-    //  @ApiBearerAuth()
-    //  @UseGuards(AuthGuard('jwt'), UserRoleGuard)
-    //  async deleteCloudWallet(
-    //      @Res() res: Response,
-    //      @User() user: user,
-    //      @Query('deleteHolder') deleteHolder: boolean = false
-    //  ): Promise<Response> {
-    //      const {id} = user;
-
-    //      const cloudWalletDetails: IDeleteCloudWallet = {
-    //         userId: id,
-    //         deleteHolder
-    //      };
-
-    //     await this.cloudWalletService.deleteCloudWallet(cloudWalletDetails);
-    //     const finalResponse: IResponse = {
-    //          statusCode: HttpStatus.OK,
-    //          message: ResponseMessages.cloudWallet.success.delete
-    //      };
-    //      return res.status(HttpStatus.OK).json(finalResponse);
- 
-    //  }
-
-         /**
+    /**
         * Delete cloud wallet 
         * @param res 
         * @returns Success message
     */
-     @Post('/export-wallet')
-     @ApiOperation({ summary: 'Create cloud wallet', description: 'Create cloud wallet' })
-     @ApiResponse({ status: HttpStatus.CREATED, description: 'Created', type: ApiResponseDto })
+     @Delete('/delete-wallet')
+     @ApiOperation({ summary: 'Delete cloud wallet', description: 'Delete cloud wallet' })
+     @ApiResponse({ status: HttpStatus.OK, type: ApiResponseDto })
      @ApiBearerAuth()
      @UseGuards(AuthGuard('jwt'), UserRoleGuard)
-     async exportCloudWallet(
+     async deleteCloudWallet(
          @Res() res: Response,
-         @User() user: user
+         @User() user: user,
+         @Query('deleteHolder') deleteHolder: boolean = false
      ): Promise<Response> {
-        //  const {id} = user;
+         const {id} = user;
 
-        //  const cloudWalletDetails: IExportCloudWallet = {
-        //     userId: id
-        //  };
+         const cloudWalletDetails: IDeleteCloudWallet = {
+            userId: id,
+            deleteHolder
+         };
 
-        // await this.cloudWalletService.deleteCloudWallet(cloudWalletDetails);
+        await this.cloudWalletService.deleteCloudWallet(cloudWalletDetails);
         const finalResponse: IResponse = {
              statusCode: HttpStatus.OK,
              message: ResponseMessages.cloudWallet.success.delete
@@ -156,6 +127,7 @@ export class CloudWalletController {
          return res.status(HttpStatus.OK).json(finalResponse);
  
      }
+
 
     /**
         * Check cloud wallet status 
@@ -175,14 +147,22 @@ export class CloudWalletController {
             userId: id,
             email
         };
-
-        const checkCloudWalletStatusRes = await this.cloudWalletService.checkCloudWalletStatus(checkCloudWalletStatus);
+        try {
+            const checkCloudWalletStatusRes = await this.cloudWalletService.checkCloudWalletStatus(checkCloudWalletStatus);
         const finalResponse: IResponse = {
             statusCode: HttpStatus.OK,
             message: ResponseMessages.cloudWallet.success.checkCloudWalletStatus,
             data: checkCloudWalletStatusRes
         };
         return res.status(HttpStatus.CREATED).json(finalResponse);
+        } catch (error) {
+            if ('P2025' === error?.code) {
+                return res.status(HttpStatus.NOT_FOUND).json({message:'Not found'});
+            }
+            throw error;
+        }
+        
+        
     }
 
      @Get('get-active-base-wallet')
@@ -550,6 +530,41 @@ export class CloudWalletController {
 
     return res.status(HttpStatus.CREATED).json(finalResponse);
   }
+
+
+    /**
+   * Create did
+   * @param orgId
+   * @returns did
+   */
+  @Post('/export-wallet')
+  @ApiOperation({
+    summary: 'Export Wallet',
+    description: 'Export Wallet'
+  })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+  @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: ApiResponseDto })
+  async exportWallet(
+    @Body() exportWallet: ExportCloudWalletDto,
+    @User() user: user,
+    @Res() res: Response
+  ): Promise<Response> {
+    const {email, id} = user;
+    exportWallet.email = email;
+    exportWallet.userId = id;
+
+    const exportWalletDetails = await this.cloudWalletService.exportWallet(exportWallet);
+
+    const finalResponse: IResponse = {
+      statusCode: HttpStatus.OK,
+      message: ResponseMessages.agent.success.exportWallet,
+      data: exportWalletDetails
+    };
+
+    return res.status(HttpStatus.CREATED).json(finalResponse);
+  }
+  
 
    /**
         * Get DID list by tenant id

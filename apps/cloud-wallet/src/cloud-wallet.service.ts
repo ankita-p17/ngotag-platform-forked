@@ -46,7 +46,8 @@ import {
   ISelfAttestedCredential,
   IW3cCredentials,
   IDeleteCloudWallet,
-  ICheckCloudWalletStatus
+  ICheckCloudWalletStatus,
+  IExportCloudWallet
 } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { CloudWalletRepository } from './cloud-wallet.repository';
 import { ResponseMessages } from '@credebl/common/response-messages';
@@ -474,45 +475,6 @@ export class CloudWalletService {
     }
   }
 
-  // async exportCloudWallet(cloudWalletDetails: IExportCloudWallet): Promise<cloud_wallet_user_info> {
-  //   try {
-
-  //     const { agentEndpoint, agentApiKey } = baseWalletDetails;
-  //     const url = `${agentEndpoint}${CommonConstants.URL_SHAGENT_CREATE_TENANT}`;
-  //     const decryptedApiKey = await this.commonService.decryptPassword(agentApiKey);
-
-  //     const createCloudWalletResponse = await this.commonService.httpPost(url, agentPayload, {
-  //       headers: { authorization: decryptedApiKey }
-  //     });
-
-  //     if (!createCloudWalletResponse && !createCloudWalletResponse.id) {
-  //       throw new InternalServerErrorException(ResponseMessages.cloudWallet.error.createCloudWallet, {
-  //         cause: new Error(),
-  //         description: ResponseMessages.errorMessages.serverError
-  //       });
-  //     }
-
-  //     const cloudWalletResponse: ICloudWalletDetails = {
-  //       createdBy: userId,
-  //       label,
-  //       lastChangedBy: userId,
-  //       tenantId: createCloudWalletResponse.id,
-  //       type: CloudWalletType.SUB_WALLET,
-  //       userId,
-  //       agentApiKey,
-  //       agentEndpoint,
-  //       email,
-  //       key: walletKey,
-  //       connectionImageUrl
-  //     };
-  //     const storeCloudWalletDetails = await this.cloudWalletRepository.getCloudWalletInfo(cloudWalletResponse);
-  //     return storeCloudWalletDetails;
-  //   } catch (error) {
-  //     this.logger.error(`[createCloudWallet] - error in export cloud wallet: ${error}`);
-  //     await this.commonService.handleError(error);
-  //   }
-  // }
-
 
     /**
    * Create clous wallet
@@ -670,6 +632,51 @@ export class CloudWalletService {
       return didDetailsResponse;
     } catch (error) {
       this.logger.error(`[createDid] - error in create DID: ${error}`);
+      await this.commonService.handleError(error);
+    }
+  }
+
+    /**
+   * Create DID for cloud wallet
+   * @param exportWallet
+   * @returns DID details
+   */
+  async exportCloudWallet(exportWallet: IExportCloudWallet): Promise<Response> {
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { email, userId, passKey } = exportWallet;
+
+      const checkUserExist = await this.cloudWalletRepository.checkUserExist(userId);
+
+      if (!checkUserExist) {
+        throw new ConflictException(ResponseMessages.cloudWallet.error.walletNotExist);
+      }
+      const [getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
+
+      const { tenantId } = getTenant;
+      const { agentEndpoint } = getTenant;
+      // Change here 
+      const url = `${agentEndpoint}${CommonConstants.URL_CLOUD_WALLET_EXPORT}${tenantId}`;
+
+      const checkCloudWalletAgentHealth = await this.commonService.checkAgentHealth(agentEndpoint, decryptedApiKey);
+
+      if (!checkCloudWalletAgentHealth) {
+        throw new NotFoundException(ResponseMessages.cloudWallet.error.agentNotRunning);
+      }
+      const exportWalletResponse = await this.commonService.httpPost(url, {passKey}, {
+        headers: { authorization: decryptedApiKey }
+      });
+
+      if (!exportWalletResponse) {
+        throw new InternalServerErrorException(ResponseMessages.cloudWallet.error.exportWallet, {
+          cause: new Error(),
+          description: ResponseMessages.errorMessages.serverError
+        });
+      }
+
+      return exportWalletResponse;
+    } catch (error) {
+      this.logger.error(`[export wallet] - error while exporting wallet: ${error}`);
       await this.commonService.handleError(error);
     }
   }
