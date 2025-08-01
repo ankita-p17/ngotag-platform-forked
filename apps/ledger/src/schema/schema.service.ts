@@ -281,10 +281,18 @@ export class SchemaService extends BaseService {
       const orgAgentType = await this.schemaRepository.getOrgAgentType(getAgentDetails.org_agents[0].orgAgentTypeId);
       let url;
       if (OrgAgentType.DEDICATED === orgAgentType) {
-        url = `${agentEndPoint}${CommonConstants.DEDICATED_CREATE_POLYGON_W3C_SCHEMA}`;
+        if (agentDetails.orgDid.includes(JSONSchemaType.POLYGON_W3C)) {
+          url = `${agentEndPoint}${CommonConstants.DEDICATED_CREATE_POLYGON_W3C_SCHEMA}`;
+        } else if (agentDetails.orgDid.includes(JSONSchemaType.ETHEREUM_W3C)) {
+          url = `${agentEndPoint}${CommonConstants.DEDICATED_CREATE_ETHEREUM_W3C_SCHEMA}`;
+        }
       } else if (OrgAgentType.SHARED === orgAgentType) {
         const { tenantId } = await this.schemaRepository.getAgentDetailsByOrgId(orgId);
-        url = `${agentEndPoint}${CommonConstants.SHARED_CREATE_POLYGON_W3C_SCHEMA}${tenantId}`;
+        if (agentDetails.orgDid.includes(JSONSchemaType.POLYGON_W3C)) {
+          url = `${agentEndPoint}${CommonConstants.SHARED_CREATE_POLYGON_W3C_SCHEMA}${tenantId}`;
+        } else if (agentDetails.orgDid.includes(JSONSchemaType.ETHEREUM_W3C)) {
+          url = `${agentEndPoint}${CommonConstants.SHARED_CREATE_ETHEREUM_W3C_SCHEMA}${tenantId}`;
+        }
       }
       const schemaObject = await this.w3cSchemaBuilder(attributes, schemaName, description);  
       if (!schemaObject) {
@@ -303,10 +311,10 @@ export class SchemaService extends BaseService {
         orgId,
         schemaRequestPayload: agentSchemaPayload
       };
-      if (schemaPayload.schemaType === JSONSchemaType.POLYGON_W3C) {
+      if (schemaPayload.schemaType === JSONSchemaType.POLYGON_W3C || schemaPayload.schemaType === JSONSchemaType.ETHEREUM_W3C) {
         const createSchemaPayload = await this._createW3CSchema(W3cSchemaPayload);
         createSchema = createSchemaPayload.response;
-        createSchema.type = JSONSchemaType.POLYGON_W3C;
+        createSchema.type = schemaPayload.schemaType;
       } else {
         const createSchemaPayload = await this._createW3CledgerAgnostic(schemaObject);
         if (!createSchemaPayload) {

@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { user } from '@prisma/client';
 import { BaseService } from 'libs/service/base.service';
-import { AgentSpinupDto } from './dto/agent-service.dto';
+import { AgentSpinupDto, IVerifySignature } from './dto/agent-service.dto';
 import { CreateTenantDto } from './dto/create-tenant.dto';
 import { AgentSpinUpSatus, IWalletRecord } from './interface/agent-service.interface';
 import { AgentStatus } from './interface/agent-service.interface';
@@ -73,6 +73,13 @@ export class AgentService extends BaseService {
         return this.sendNatsMessage(this.agentServiceProxy, 'polygon-create-keys', payload);
     }
 
+      async createEthKeyPair(orgId:string): Promise<object> {
+        const payload = {orgId};
+        // NATS call
+        
+        return this.sendNatsMessage(this.agentServiceProxy, 'ethereum-create-keys', payload);
+    }
+
     async agentConfigure(agentConfigureDto: AgentConfigureDto, user: user): Promise<object> {
         const payload = { agentConfigureDto, user };
         // NATS call
@@ -85,6 +92,16 @@ export class AgentService extends BaseService {
         // NATS call
         
         return this.sendNatsMessage(this.agentServiceProxy, 'delete-wallet', payload);
+    }
+
+    async signData(data: unknown, orgId: string): Promise<unknown> {
+        const payload = { data, orgId };
+        return this.sendNatsMessage(this.agentServiceProxy, 'sign-data-from-agent', payload);
+    }
+    
+    async verifySignature(data: IVerifySignature, orgId: string): Promise<AgentStatus> {
+        const payload = { data, orgId };
+        return this.sendNatsMessage(this.agentServiceProxy, 'verify-signature-from-agent', payload);
     }
 
 }

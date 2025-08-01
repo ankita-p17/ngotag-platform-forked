@@ -21,7 +21,8 @@ import {
   ApiResponse,
   ApiOperation,
   ApiUnauthorizedResponse,
-  ApiForbiddenResponse,
+  ApiForbiddenResponse,  
+  ApiBody,
   ApiBearerAuth
 } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
@@ -31,7 +32,7 @@ import { ForbiddenErrorDto } from '../dtos/forbidden-error.dto';
 import { ResponseMessages } from '@credebl/common/response-messages';
 import { AgentService } from './agent-service.service';
 import IResponseType, { IResponse } from '@credebl/common/interfaces/response.interface';
-import { AgentSpinupDto } from './dto/agent-service.dto';
+import { AgentSpinupDto, IVerifySignature, SignDataDto, VerifySignatureDto } from './dto/agent-service.dto';
 import { Response } from 'express';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { user } from '@prisma/client';
@@ -232,15 +233,12 @@ export class AgentController {
         description: ResponseMessages.errorMessages.badRequest
       });
     }
-
     const didDetails = await this.agentService.createDid(createDidDto, orgId, user);
-
     const finalResponse: IResponse = {
       statusCode: HttpStatus.CREATED,
       message: ResponseMessages.agent.success.createDid,
       data: didDetails
     };
-
     return res.status(HttpStatus.CREATED).json(finalResponse);
   }
 
@@ -255,6 +253,27 @@ export class AgentController {
   @ApiResponse({ status: HttpStatus.CREATED, description: 'Success', type: ApiResponseDto })
   async createSecp256k1KeyPair(@Param('orgId') orgId: string, @Res() res: Response): Promise<Response> {
     const didDetails = await this.agentService.createSecp256k1KeyPair(orgId);
+
+    const finalResponse: IResponse = {
+      statusCode: HttpStatus.CREATED,
+      message: ResponseMessages.agent.success.createKeys,
+      data: didDetails
+    };
+
+    return res.status(HttpStatus.CREATED).json(finalResponse);
+  }
+
+  /**
+   * Create 
+   * @param orgId
+   * @returns Secp256k1 key pair for polygon DID
+   */
+  @Post('/orgs/:orgId/agents/ethereum/create-keys')
+  @UseGuards(AuthGuard('jwt'), OrgRolesGuard)
+  @Roles(OrgRoles.OWNER, OrgRoles.ADMIN, OrgRoles.PLATFORM_ADMIN, OrgRoles.ISSUER, OrgRoles.VERIFIER)
+  @ApiResponse({ status: HttpStatus.CREATED, description: 'Success', type: ApiResponseDto })
+  async createEthKeyPair(@Param('orgId') orgId: string, @Res() res: Response): Promise<Response> {
+    const didDetails = await this.agentService.createEthKeyPair(orgId);
 
     const finalResponse: IResponse = {
       statusCode: HttpStatus.CREATED,
@@ -321,4 +340,87 @@ export class AgentController {
 
     return res.status(HttpStatus.OK).json(finalResponse);
   }
+
+  /**
+   * Sign data from agent
+   * @param orgId The ID of the organization
+   * @param reqUser The user making the request
+   * @param res The response object
+   * @returns Get agent details
+   */
+  @ApiBody({
+    description:
+      'Enter the data you would like to sign. It can be of type w3c jsonld credential or any type that needs to be signed',
+    type: SignDataDto,
+    required: true
+  })
+  @Post('/orgs/:orgId/agents/sign')
+  @ApiOperation({
+    summary: 'Signs data from agent',
+    description: 'Signs data from agent'
+  })
+  @UseGuards(AuthGuard('jwt'), OrgRolesGuard)
+  @Roles(
+    OrgRoles.OWNER,
+    OrgRoles.ADMIN,
+    OrgRoles.HOLDER,
+    OrgRoles.ISSUER,
+    OrgRoles.SUPER_ADMIN,
+    OrgRoles.MEMBER,
+    OrgRoles.VERIFIER
+  )
+  async signData(@Param('orgId') orgId: string, @Body() data: SignDataDto, @Res() res: Response): Promise<Response> {
+    const agentData = await this.agentService.signData(data, orgId);
+    const finalResponse: IResponse = {
+      statusCode: HttpStatus.OK,
+      message: ResponseMessages.agent.success.sign,
+      data: agentData
+    };
+
+    return res.status(HttpStatus.OK).json(finalResponse);
+  }
+
+  /**
+   * Get Organization agent health
+   * @param orgId The ID of the organization
+   * @param reqUser The user making the request
+   * @param res The response object
+   * @returns Get agent details
+   */
+  @ApiBody({
+    type: VerifySignatureDto,
+    description:
+      'Enter the data you would like to verify the signature for. It can be of type w3c jsonld credential or any type that needs to be verified'
+  })
+  @Post('/orgs/:orgId/agents/verify-signature')
+  @ApiOperation({
+    summary: 'Validates signed data from agent, including credentials',
+    description: 'Credentials or any other data signed by the organization is validated'
+  })
+  @UseGuards(AuthGuard('jwt'), OrgRolesGuard)
+  @Roles(
+    OrgRoles.OWNER,
+    OrgRoles.ADMIN,
+    OrgRoles.HOLDER,
+    OrgRoles.ISSUER,
+    OrgRoles.SUPER_ADMIN,
+    OrgRoles.MEMBER,
+    OrgRoles.VERIFIER
+  )
+  async verifySignature(
+    @Param('orgId') orgId: string,
+    @Body() data: IVerifySignature,
+    @Res() res: Response
+  ): Promise<Response> {
+    this.logger.log(`[verifySignature] - verifying signature for orgId: ${orgId} with data ${JSON.stringify(data)}`);
+    const agentData = await this.agentService.verifySignature(data, orgId);
+    const finalResponse: IResponse = {
+      statusCode: HttpStatus.OK,
+      message: ResponseMessages.agent.success.verify,
+      data: agentData
+    };
+
+    return res.status(HttpStatus.OK).json(finalResponse);
+  }
+
 }
