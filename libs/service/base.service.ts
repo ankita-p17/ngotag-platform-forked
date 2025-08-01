@@ -28,6 +28,7 @@ export class BaseService {
   }
 
 
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 sendNatsMessage(serviceProxy: ClientProxy, cmd: string, payload: any): Promise<any> {
   const pattern = { cmd };
 

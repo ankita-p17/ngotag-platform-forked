@@ -1,3 +1,6 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable, Logger } from '@nestjs/common';
 // import * as firebase from 'firebase-admin';
 
@@ -6,7 +9,7 @@ export class PushNotificationsService {
 
     private logger = new Logger('PushNotificationsService');
 
-    public pushNotification(firebaseToken: string, payload: any, options: any) {
+    public pushNotification(firebaseToken: string, payload: unknown, options: unknown) {
         // set  file path from server where firebase configuration file
         // if (firebaseToken) {
         //     return firebase.messaging().sendToDevice(firebaseToken, payload, options)
@@ -21,7 +24,7 @@ export class PushNotificationsService {
     }
 
 
-    public webPushNotification(firebaseToken: string, payload: any) {
+    public webPushNotification(firebaseToken: string, payload: unknown) {
         // set  file path from server where firebase configuration file
         const options = {
             priority: 'high',

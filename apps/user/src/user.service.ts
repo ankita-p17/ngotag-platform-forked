@@ -931,7 +931,7 @@ export class UserService {
            // eslint-disable-next-line no-case-declarations
            const QRDetails = await this.getShorteningURL(shareUserCertificate, attributeArray);
 
-           if (shareUserCertificate.attributes.some(item => item.value.toLocaleLowerCase().includes("pinnacle"))) {
+           if (shareUserCertificate.attributes.some(item => item.value.toLocaleLowerCase().includes('pinnacle'))) {
             const userPinnacleTemplate = new EventPinnacle();
             template = await userPinnacleTemplate.getPinnacleWinner(attributeArray, QRDetails);
           } else {
@@ -1002,7 +1002,7 @@ export class UserService {
       credDefId: shareUserCertificate.credDefId,
       attribute: attributeArray,
       credentialId:shareUserCertificate.credentialId,
-      email:attributeArray.find((attr) => "email" in attr).email
+      email:attributeArray.find((attr) => 'email' in attr).email
     };
 
     const qrCodeOptions = { type: 'image/png' };

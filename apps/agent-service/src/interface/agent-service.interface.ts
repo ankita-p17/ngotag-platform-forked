@@ -80,7 +80,7 @@ export interface IWallet {
 }
 
 export interface IDidCreate {
-  keyType: KeyType;
+  keyType: string;
   seed: string;
   domain?: string;
   network?: string;
