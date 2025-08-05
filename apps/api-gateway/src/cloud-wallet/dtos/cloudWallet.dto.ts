@@ -202,6 +202,12 @@ export class ReceiveInvitationUrlDTO {
     @IsString({ message: 'passKey must be in string format.' })
     passKey: string;
 
+    @ApiPropertyOptional({ example: 'walletID' })
+    @Transform(({ value }) => trim(value))
+    @IsNotEmpty({ message: 'walletID is required' })
+    @IsString({ message: 'walletID must be in string format.' })
+    walletID: string;
+
 
     email: string;
     

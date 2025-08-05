@@ -644,7 +644,7 @@ export class CloudWalletService {
   async exportCloudWallet(exportWallet: IExportCloudWallet): Promise<Response> {
     try {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { email, userId, passKey } = exportWallet;
+      const { email, userId, passKey, walletID } = exportWallet;
 
       const checkUserExist = await this.cloudWalletRepository.checkUserExist(userId);
 
@@ -663,7 +663,7 @@ export class CloudWalletService {
       if (!checkCloudWalletAgentHealth) {
         throw new NotFoundException(ResponseMessages.cloudWallet.error.agentNotRunning);
       }
-      const exportWalletResponse = await this.commonService.httpPost(url, {passKey}, {
+      const exportWalletResponse = await this.commonService.httpPost(url, {passKey, walletID}, {
         headers: { authorization: decryptedApiKey }
       });
 
