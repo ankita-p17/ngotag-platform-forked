@@ -488,6 +488,7 @@ export interface IW3cCredentials {
 
 export interface IExportCloudWallet {
   passKey: string;
+  walletID: string;
   userId: string;
   email: string;
 }
