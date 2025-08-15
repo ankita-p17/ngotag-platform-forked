@@ -655,7 +655,7 @@ export class ConnectionService {
       if (IsReuseConnection) {
         const invitation: agent_invitations = await this.connectionRepository.getInvitationDidByOrgId(orgId);
         legacyinvitationDid = invitation?.invitationDid ?? undefined;
-        this.logger.log('legacyinvitationDid:', legacyinvitationDid);
+        this.logger.debug('legacyinvitationDid:', legacyinvitationDid);
       }
       const connectionInvitationDid = invitationDid ? invitationDid : legacyinvitationDid;
 
