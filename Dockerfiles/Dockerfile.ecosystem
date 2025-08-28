@@ -1,6 +1,9 @@
 # Stage 1: Build the application
 FROM node:18-alpine as build
-RUN npm install -g pnpm
+RUN npm install -g pnpm --ignore-scripts \
+  && apk update \
+  && apk add openssl
+
 # Set the working directory
 WORKDIR /app
 
@@ -14,14 +17,17 @@ RUN pnpm i
 # Copy the rest of the application code
 COPY . .
 # RUN cd libs/prisma-service && npx prisma migrate deploy && npx prisma generate
-RUN cd libs/prisma-service && npx prisma migrate deploy && npx prisma generate
+RUN cd libs/prisma-service && npx prisma generate
 
 # Build the issuance service
 RUN pnpm run build ecosystem
 
 # Stage 2: Create the final image
 FROM node:18-alpine
-RUN npm install -g pnpm
+RUN npm install -g pnpm --ignore-scripts \
+  && apk update \
+  && apk add openssl
+
 # Set the working directory
 WORKDIR /app
 
@@ -35,4 +41,4 @@ COPY --from=build /app/node_modules  ./node_modules
 
 
 # Set the command to run the microservice
-CMD ["sh", "-c", "cd libs/prisma-service && npx prisma migrate deploy && cd ../.. && node dist/apps/ecosystem/main.js"]
+CMD ["sh", "-c", "cd libs/prisma-service && npx prisma generate npx prisma migrate deploy && cd ../.. && node dist/apps/ecosystem/main.js"]

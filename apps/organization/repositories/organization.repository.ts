@@ -442,13 +442,14 @@ export class OrganizationRepository {
               agentsTypeId: true,
               orgAgentTypeId: true,
               createDateTime: true,
-              agent_invitations: {
-                select: {
-                  id: true,
-                  connectionInvitation: true,
-                  multiUse: true
-                }
-              },
+              // Following returns huge response for exceeding NATS max payload size
+              // agent_invitations: {
+              //   select: {
+              //     id: true,
+              //     connectionInvitation: true,
+              //     multiUse: true
+              //   }
+              // },
               org_agent_type: true,
               ledgers: {
                 select: {

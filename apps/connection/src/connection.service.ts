@@ -660,8 +660,6 @@ export class ConnectionService {
 
       this.logger.log('connectionInvitationDid:', connectionInvitationDid);
 
-      
-      this.logger.log(`logoUrl:::, ${organisation.logoUrl}`);
       const connectionPayload = {
         multiUseInvitation: multiUseInvitation ?? true,
         autoAcceptConnection: autoAcceptConnection ?? true,

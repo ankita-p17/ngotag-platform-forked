@@ -1,16 +1,16 @@
 {
   "platformConfigData": {
-    "externalIp": "##Machine Ip Address/Domain for agent setup##",
-    "inboundEndpoint": "##Machine Ip Address/Domain for agent setup##",
-    "username": "credebl",
+    "externalIp": "agent.nashidplatform.com",
+    "inboundEndpoint": "agent-inbound.nashidplatform.com",
+    "username": "nashid",
     "sgApiKey": "###Sendgrid Key###",
     "emailFrom": "##Senders Mail ID##",
-    "apiEndpoint": "## Platform API Ip Address##",
+    "apiEndpoint": "service.nashidplatform.com",
     "tailsFileServer": "##Machine Ip Address for agent setup##"
   },
   "platformAdminData": {
-    "firstName": "CREDEBL",
-    "lastName": "CREDEBL",
+    "firstName": "NASHID",
+    "lastName": "NASHID",
     "email": "",
     "username": "",
     "password": "####Please provide encrypted password using crypto-js###",
@@ -136,6 +136,33 @@
       "indyNamespace": "polygon:testnet"
     },
     {
+      "name": "Polygon Mainnet",
+      "networkType": "mainnet",
+      "poolConfig": "",
+      "isActive": true,
+      "networkString": "mainnet",
+      "nymTxnEndpoint": "",
+      "indyNamespace": "polygon:mainnet"
+    },
+    {
+      "name": "Ethr Sepolia",
+      "networkType": "sepolia",
+      "poolConfig": "",
+      "isActive": true,
+      "networkString": "sepolia",
+      "nymTxnEndpoint": "",
+      "indyNamespace": "ethr:sepolia"
+    },
+    {
+      "name": "Ethr Mainnet",
+      "networkType": "mainnet",
+      "poolConfig": "",
+      "isActive": true,
+      "networkString": "mainnet",
+      "nymTxnEndpoint": "",
+      "indyNamespace": "ethr:mainnet"
+    },
+    {
       "name": "NA",
       "networkType": "NA",
       "poolConfig": "NA",
@@ -219,6 +246,15 @@
         "did:polygon": {
             "mainnet":"did:polygon:mainnet",
             "testnet":"did:polygon:testnet"
+        }
+    }
+    },
+    {
+      "name": "ethereum",
+      "details":  {
+        "did:ethr": {
+            "mainnet":"did:ethr",
+            "testnet":"did:ethr:sepolia"
         }
     }
     },

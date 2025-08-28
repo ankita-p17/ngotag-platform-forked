@@ -26,6 +26,7 @@ import {
 import { Prisma, user } from '@prisma/client';
 import { InvitationMessage } from '@credebl/common/interfaces/agent-service.interface';
 import { AgentSpinUpStatus } from '@credebl/enum/enum';
+import { SignDataDto, VerifySignatureDto } from 'apps/api-gateway/src/agent-service/dto/agent-service.dto';
 
 @Controller()
 export class AgentServiceController {
@@ -281,6 +282,11 @@ export class AgentServiceController {
     return this.agentServiceService.createSecp256k1KeyPair(payload.orgId);
   }
 
+   @MessagePattern({ cmd: 'ethereum-create-keys' })
+  async createEthKeyPair(payload: { orgId: string }): Promise<object> {
+    return this.agentServiceService.createEthereumKeyPair(payload.orgId);
+  }
+
   @MessagePattern({ cmd: 'agent-create-connection-invitation' })
   async createConnectionInvitation(payload: {
     url: string,
@@ -301,5 +307,25 @@ export class AgentServiceController {
     user: IUserRequestInterface,
   }): Promise<IStoreAgent> {
     return this.agentServiceService.agentConfigure(payload.agentConfigureDto, payload.user);
+  }
+
+  /**
+   * Sign data from agent
+   * @param payload
+   * @returns Signed data by agent
+   */
+  @MessagePattern({ cmd: 'sign-data-from-agent' })
+  async signData(payload: { data: SignDataDto; orgId: string }): Promise<unknown> {
+    return this.agentServiceService.signDataFromAgent(payload.data, payload.orgId);
+  }
+
+  /**
+   * Verify signature on a payload from agent
+   * @param payload
+   * @returns Get agent health
+   */
+  @MessagePattern({ cmd: 'verify-signature-from-agent' })
+  async verifySignature(payload: { data: VerifySignatureDto; orgId: string }): Promise<unknown> {
+    return this.agentServiceService.verifySignature(payload.data, payload.orgId);
   }
 }

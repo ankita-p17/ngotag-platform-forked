@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-duplicate-enum-values */
 export enum CommonConstants {
   // Error and Success Responses from POST and GET calls
   RESP_ERR_HTTP_INVALID_HEADER_VALUE = 'ERR_HTTP_INVALID_HEADER_VALUE',
@@ -89,7 +90,9 @@ export enum CommonConstants {
 
   // POLYGON BASED W3C SCHEMAS
   DEDICATED_CREATE_POLYGON_W3C_SCHEMA = '/polygon/create-schema',
+  DEDICATED_CREATE_ETHEREUM_W3C_SCHEMA = '/ethereum/create-schema',
   SHARED_CREATE_POLYGON_W3C_SCHEMA = '/multi-tenancy/polygon-wc3/schema/',
+  SHARED_CREATE_ETHEREUM_W3C_SCHEMA = '/multi-tenancy/ethereum-wc3/schema/',
 
   // SHARED AGENT
   URL_SHAGENT_CREATE_TENANT = '/multi-tenancy/create-tenant',
@@ -123,6 +126,8 @@ export enum CommonConstants {
   URL_SHAGENT_DELETE_SUB_WALLET = '/multi-tenancy/#',
   URL_SHARED_SEND_BASIC_MESSAGE =  '/multi-tenancy/basic-messages/#/@',
   URL_SHAGENT_ACCEPT_PROOF_REQUEST = '/multi-tenancy/proofs/#/accept-request/@',
+  URL_SHARED_AGENT_SIGN_DATA = '/multi-tenancy/sign/#',
+  URL_SHARED_AGENT_VERIFY_SIGNED_DATA = '/multi-tenancy/verify/#',
 
   
   // PROOF SERVICES
@@ -141,7 +146,7 @@ export enum CommonConstants {
 
   // CREATE KEYS
   CREATE_POLYGON_SECP256k1_KEY = '/polygon/create-keys',
- 
+  CREATE_ETH_KEY = '/ethereum/create-keys',
 
   // ENTITY NAMES
   ENTITY_NAME_TEMPLATE = 'templates',
@@ -250,7 +255,7 @@ export enum CommonConstants {
 
   // agent status
   URL_AGENT_STATUS = '/agent',
-  
+
   // Tenant Status
   PENDING_STATE = 0,
   REJECT_STATE = 2,
@@ -276,7 +281,6 @@ export enum CommonConstants {
   INACTIVE_NON_ADMIN_USER = 2,
   ACTIVE_NON_ADMIN_USER = 1,
   ALL_NON_ADMIN_USER = 3,
-
 
   // Platform admin Details
   PLATFORM_ADMIN_EMAIL='platform.admin@yopmail.com',
@@ -326,11 +330,11 @@ export enum CommonConstants {
   KEYTYPE = 'ed25519',
   METHOD = 'indy',
   NETWORK = 'bcovrin:testnet',
-  ROLE = 'endorser', 
+  ROLE = 'endorser',
 
  //CacheInfo
-CACHE_SHARED_APIKEY_KEY = "dedicatedApiKey",
-CACHE_APIKEY_KEY = "sharedApiKey",
+CACHE_SHARED_APIKEY_KEY = 'dedicatedApiKey',
+CACHE_APIKEY_KEY = 'sharedApiKey',
 CACHE_TTL_SECONDS = 604800,
 
 CLOUD_WALLET_GET_PROOF_REQUEST = '/multi-tenancy/proofs',
@@ -385,7 +389,11 @@ CLOUD_WALLET_SERVICE = 'cloud-wallet',
 //CLOUD WALLET
 RECEIVE_INVITATION_BY_URL = '/multi-tenancy/receive-invitation-url/',
 ACCEPT_OFFER = '/multi-tenancy/credentials/accept-offer/',
-SEED_LENGTH = 32
+SEED_LENGTH = 32,
+
+// sign data from agent
+URL_AGENT_SIGN_DATA = '/sign',
+URL_AGENT_VERIFY_SIGNED_DATA = '/verify',
 }
 
 export const ATTRIBUTE_NAME_REGEX = /\['(.*?)'\]/;

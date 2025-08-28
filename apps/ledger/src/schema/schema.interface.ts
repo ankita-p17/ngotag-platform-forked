@@ -1,4 +1,4 @@
-import { IUserRequestInterface } from "./interfaces/schema.interface";
+import { IUserRequestInterface } from './interfaces/schema.interface';
 
 export interface SchemaSearchCriteria {
     schemaLedgerId: string;

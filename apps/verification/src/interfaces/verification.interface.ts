@@ -101,8 +101,14 @@ interface IRequestedRestriction {
 export interface ISchema {
     uri:string;
 }
+
+export interface IFilter {
+    type: string;
+    pattern: string;
+}
 export interface IFields {
     path: string[];
+    filter: IFilter;
   }
 export interface IConstraints {
     fields: IFields[];
@@ -121,6 +127,7 @@ export interface IInputDescriptors {
 export interface IProofRequestPresentationDefinition {
     id:string;
     name: string;
+    purpose: string;
     input_descriptors:IInputDescriptors[];
 }
 

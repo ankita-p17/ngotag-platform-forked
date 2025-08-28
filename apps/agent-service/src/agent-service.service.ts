@@ -76,6 +76,8 @@ import { InvitationMessage } from '@credebl/common/interfaces/agent-service.inte
 import * as CryptoJS from 'crypto-js';
 import { UserActivityRepository } from 'libs/user-activity/repositories';
 import { PrismaService } from '@credebl/prisma-service';
+import { SignDataDto, VerifySignatureDto } from 'apps/api-gateway/src/agent-service/dto/agent-service.dto';
+import { IVerificationMethod } from 'apps/organization/interfaces/organization.interface';
 
 @Injectable()
 @WebSocketGateway()
@@ -960,6 +962,10 @@ export class AgentServiceService {
         createDidPayload.endpoint = agentDetails.agentEndPoint;
       }
 
+        if (createDidPayload.method === DidMethod.ETHEREUM) {
+        createDidPayload.endpoint = agentDetails.agentEndPoint;
+      }
+
       const { isPrimaryDid, ...payload } = createDidPayload;
       const didDetails = await this.getDidDetails(url, payload, getApiKey);
       const getDidByOrg = await this.agentServiceRepository.getOrgDid(orgId);
@@ -1092,6 +1098,33 @@ export class AgentServiceService {
       return createKeyPairResponse;
     } catch (error) {
       this.logger.error(`error in createSecp256k1KeyPair : ${JSON.stringify(error)}`);
+      throw new RpcException(error.response ? error.response : error);
+    }
+  }
+
+
+  /**
+   * @returns ethereum key pair for Ethr DID
+   */
+  async createEthereumKeyPair(orgId: string): Promise<object> {
+    try {
+      const platformAdminSpinnedUp = await this.agentServiceRepository.platformAdminAgent(
+        CommonConstants.PLATFORM_ADMIN_ORG
+      );
+
+      const getPlatformAgentEndPoint = platformAdminSpinnedUp.org_agents[0].agentEndPoint;
+      const getDcryptedToken = await this.commonService.decryptPassword(platformAdminSpinnedUp?.org_agents[0].apiKey);
+
+      const url = `${getPlatformAgentEndPoint}${CommonConstants.CREATE_ETH_KEY}`;
+
+      const createKeyPairResponse = await this.commonService.httpPost(
+        url,
+        {},
+        { headers: { authorization: getDcryptedToken } }
+      );
+      return createKeyPairResponse;
+    } catch (error) {
+      this.logger.error(`error in create ethereum KeyPair : ${JSON.stringify(error)}`);
       throw new RpcException(error.response ? error.response : error);
     }
   }
@@ -1567,6 +1600,7 @@ export class AgentServiceService {
   ): Promise<object> {
     try {
       const getApiKey = await this.getOrgAgentApiKey(orgId);
+      this.logger.log(`sendOutOfBandProofRequest: payload: ${JSON.stringify(proofRequestPayload)}`);
       const sendProofRequest = await this.commonService
         .httpPost(url, proofRequestPayload, { headers: { authorization: getApiKey } })
         .then(async (response) => response);
@@ -1918,4 +1952,174 @@ export class AgentServiceService {
       throw error;
     }
   }
+
+
+  /**
+   * Sign data from agent
+   * @param orgId
+   * @returns agent status
+   */
+  async signDataFromAgent(data: SignDataDto, orgId: string): Promise<IAgentStatus> {
+    try {
+      // Get organization agent details
+      const orgAgentDetails: org_agents = await this.agentServiceRepository.getOrgAgentDetails(orgId);
+      let agentApiKey;
+      if (orgAgentDetails) {
+        agentApiKey = await this.getOrgAgentApiKey(orgId);
+      }
+
+      if (!orgAgentDetails) {
+        throw new NotFoundException(ResponseMessages.agent.error.agentNotExists, {
+          cause: new Error(),
+          description: ResponseMessages.errorMessages.notFound
+        });
+      }
+
+      if (!orgAgentDetails?.agentEndPoint) {
+        throw new NotFoundException(ResponseMessages.agent.error.agentUrl, {
+          cause: new Error(),
+          description: ResponseMessages.errorMessages.notFound
+        });
+      }
+      const orgAgentType = await this.agentServiceRepository.getOrgAgentType(orgAgentDetails?.orgAgentTypeId);
+
+      const url = this.getAgentUrl(
+        'sign-data-from-agent',
+        orgAgentType.agent,
+        orgAgentDetails.agentEndPoint,
+        orgAgentDetails.tenantId
+      );
+
+      const { dataTypeToSign, credentialPayload, rawPayload, storeCredential } = data;
+
+      // Currently, get only primary did for issuance
+      const diddoc: OrgDid[] = await this.agentServiceRepository.getOrgDid(orgId);
+      const verificationMethod = diddoc[0].didDocument['verificationMethod'] as IVerificationMethod[];
+      this.logger.debug(`primary did document - diddoc[0]:: ${JSON.stringify(diddoc[0])}`);
+      if (dataTypeToSign === 'jsonLd' && credentialPayload) {
+        // For now, we are strictly restricting dids and verification method associated with the primary did
+        // We can optionally modify it to be taken from the payload itself
+        credentialPayload.verificationMethod = verificationMethod[0].id;
+      }
+
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      if (dataTypeToSign === 'rawData' && rawPayload) {
+        this.logger.debug(`updating raw data : diddoc[0].didDocument ${JSON.stringify(diddoc[0].didDocument)}`);
+        rawPayload.did = diddoc[0].didDocument['id'];
+        rawPayload.keyType = verificationMethod[0].type.toLowerCase().includes('ed25519') ? 'ed25519' : 'k256';
+        this.logger.debug(`rawPayload.keyType is set as:: ${rawPayload.keyType}`);
+      }
+      const dataToSign = dataTypeToSign === 'jsonLd' ? credentialPayload : rawPayload;
+
+      // Invoke an API request from the agent to assess its current status
+      const signedDataFromAgent = await this.commonService
+        .httpPost(
+          `${url}?dataTypeToSign=${dataTypeToSign}&storeCredential=${storeCredential}`,
+          { ...dataToSign },
+          {
+            headers: { authorization: agentApiKey }
+          }
+        )
+        .then(async (response) => response);
+
+      return signedDataFromAgent;
+    } catch (error) {
+      this.logger.error(`Agent signature request details : ${JSON.stringify(error)}`);
+      throw new RpcException(error.response ?? error);
+    }
+  }
+
+  /**
+   * Verify signature from agent
+   * @param orgId
+   * @returns agent status
+   */
+  async verifySignature(data: VerifySignatureDto, orgId: string): Promise<IAgentStatus> {
+    try {
+      // Get organization agent details
+      delete data['orgId'];
+      this.logger.debug(`In agent-service to verifySignature with data ::: ${JSON.stringify(data)}`);
+      const orgAgentDetails: org_agents = await this.agentServiceRepository.getOrgAgentDetails(orgId);
+      let agentApiKey;
+      if (orgAgentDetails) {
+        agentApiKey = await this.getOrgAgentApiKey(orgId);
+      }
+
+      if (!orgAgentDetails) {
+        throw new NotFoundException(ResponseMessages.agent.error.agentNotExists, {
+          cause: new Error(),
+          description: ResponseMessages.errorMessages.notFound
+        });
+      }
+
+      if (!orgAgentDetails?.agentEndPoint) {
+        throw new NotFoundException(ResponseMessages.agent.error.agentUrl, {
+          cause: new Error(),
+          description: ResponseMessages.errorMessages.notFound
+        });
+      }
+      const orgAgentType = await this.agentServiceRepository.getOrgAgentType(orgAgentDetails?.orgAgentTypeId);
+
+      const url = this.getAgentUrl(
+        'verify-signed-data-from-agent',
+        orgAgentType.agent,
+        orgAgentDetails.agentEndPoint,
+        orgAgentDetails.tenantId
+      );
+
+      // Invoke an API request from the agent to assess its current status
+      const signedDataFromAgent = await this.commonService
+        .httpPost(`${url}`, data, {
+          headers: { authorization: agentApiKey }
+        })
+        .then(async (response) => response);
+
+      return signedDataFromAgent;
+    } catch (error) {
+      this.logger.error(`Agent signature request details : ${JSON.stringify(error)}`);
+      throw new RpcException(error.response ?? error);
+    }
+  }
+
+    /**
+   * Description: Fetch agent url
+   * @param referenceId
+   * @returns agent URL
+   */
+  getAgentUrl(agentMethodLabel: string, orgAgentType: string, agentEndPoint: string, tenantId: string): string {
+    try {
+      let url;
+      switch (agentMethodLabel) {
+        case 'sign-data-from-agent': {
+          url =
+            orgAgentType === OrgAgentType.DEDICATED
+              ? `${agentEndPoint}${CommonConstants.URL_AGENT_SIGN_DATA}`
+              : orgAgentType === OrgAgentType.SHARED
+              ? `${agentEndPoint}${CommonConstants.URL_SHARED_AGENT_SIGN_DATA}`.replace('#', tenantId)
+              : null;
+          break;
+        }
+        case 'verify-signed-data-from-agent': {
+          url =
+            orgAgentType === OrgAgentType.DEDICATED
+              ? `${agentEndPoint}${CommonConstants.URL_AGENT_VERIFY_SIGNED_DATA}`
+              : orgAgentType === OrgAgentType.SHARED
+              ? `${agentEndPoint}${CommonConstants.URL_SHARED_AGENT_VERIFY_SIGNED_DATA}`.replace('#', tenantId)
+              : null;
+          break;
+        }
+        default: {
+          break;
+        }
+      }
+      if (!url) {
+        throw new NotFoundException(ResponseMessages.issuance.error.agentUrlNotFound);
+      }
+      return url;
+    } catch (error) {
+      this.logger.error(`Error in get agent url: ${JSON.stringify(error)}`);
+      throw error;
+    }
+  }
+
 }

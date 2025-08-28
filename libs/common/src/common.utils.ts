@@ -51,18 +51,18 @@ export function orderValues(key, order = 'asc') {
 
 
 export function convertUrlToDeepLinkUrl(url: string): string {
-  const deepLinkDomain = process.env.DEEPLINK_DOMAIN
-  if(!deepLinkDomain) {
-    throw new NotFoundException(ResponseMessages.shorteningUrl.error.deepLinkDomainNotFound)
+  const deepLinkDomain = process.env.DEEPLINK_DOMAIN;
+  if (!deepLinkDomain) {
+    throw new NotFoundException(ResponseMessages.shorteningUrl.error.deepLinkDomainNotFound);
   }
   const deepLinkUrl = deepLinkDomain.concat(url);
   return deepLinkUrl;
 }
 
-export const networkNamespace = (did):string => {
+export const networkNamespace = (did: string):string => {
   // Split the DID into segments using the colon as a delimiter
   const segments = did.split(':');
-  const containsTestnet = segments.some(segment => segment.includes('polygon'));
+  const containsTestnet = segments.some(segment => segment.includes('testnet')) || segments.some(segment => segment.includes('sepolia'));
   if (containsTestnet) {
     return `${segments[1]}:${segments[2]}`;
   } else {

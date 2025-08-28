@@ -4,6 +4,7 @@ FROM node:18-alpine as build
 RUN npm install -g pnpm --ignore-scripts \
     && apk update \
     && apk add openssh-client \
+    && apk add openssl \
     && apk add aws-cli \
     && apk add docker \
     && apk add docker-compose 
@@ -21,7 +22,7 @@ RUN pnpm i
 # Copy the rest of the application code
 COPY . .
 # RUN cd libs/prisma-service && npx prisma migrate deploy && npx prisma generate
-RUN cd libs/prisma-service && npx prisma migrate deploy && npx prisma generate
+RUN cd libs/prisma-service && npx prisma generate
 
 # Build the user service
 RUN pnpm run build agent-service
@@ -32,6 +33,7 @@ FROM node:18-alpine
 RUN npm install -g pnpm --ignore-scripts \
     && apk update \
     && apk add openssh-client \
+    && apk add openssl \
     && apk add aws-cli \
     && apk add docker \
     && apk add docker-compose 
@@ -49,4 +51,4 @@ COPY --from=build /app/libs/ ./libs/
 COPY --from=build /app/node_modules  ./node_modules
 
 # Set the command to run the microservice
-CMD ["sh", "-c", "cd libs/prisma-service && npx prisma migrate deploy && cd ../.. && node dist/apps/agent-service/main.js"]
+CMD ["sh", "-c", "cd libs/prisma-service && npx prisma generate npx prisma migrate deploy && cd ../.. && node dist/apps/agent-service/main.js"]

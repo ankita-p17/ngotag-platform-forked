@@ -47,7 +47,8 @@ export enum DidMethod {
     INDY = 'indy',
     KEY = 'key',
     WEB = 'web',
-    POLYGON = 'polygon'
+    POLYGON = 'polygon',
+    ETHEREUM= 'ethereum'
 }
 
 export enum Ledgers {
@@ -115,9 +116,9 @@ export enum NodeEnvironment {
 }
 
 export enum AutoAccept {
-    Always = "always",
-    ContentApproved = "contentApproved",
-    Never = "never"
+    Always = 'always',
+    ContentApproved = 'contentApproved',
+    Never = 'never'
 }
 
 export enum SortMembers {
@@ -224,6 +225,7 @@ export enum W3CSchemaDataType {
 
 export enum JSONSchemaType {
     POLYGON_W3C = 'polygon',
+    ETHEREUM_W3C = 'ethr',
     LEDGER_LESS = 'no_ledger'
 }
 
