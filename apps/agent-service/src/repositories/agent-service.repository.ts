@@ -99,22 +99,6 @@ export class AgentServiceRepository {
     }
 
     // eslint-disable-next-line camelcase
-    async createUniqueOrgAgent(data: Prisma.org_agentsCreateInput): Promise<ICreateOrgAgent> {
-        try {
-
-            return this.prisma.org_agents.create({
-                data,
-                select: {
-                    id: true
-                }
-            });
-        } catch (error) {
-            this.logger.error(`[createOrgAgent] - create agent details: ${JSON.stringify(error)}`);
-            throw error;
-        }
-    }
-
-    // eslint-disable-next-line camelcase
     async removeOrgAgent(id: string): Promise<void> {
         try {
             if (id) {

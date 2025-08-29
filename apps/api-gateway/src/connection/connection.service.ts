@@ -4,11 +4,11 @@ import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { BaseService } from 'libs/service/base.service';
 import { ConnectionDto, CreateOutOfBandConnectionInvitation, ReceiveInvitationDto, ReceiveInvitationUrlDto } from './dtos/connection.dto';
 import { IReceiveInvitationRes, IUserRequestInterface } from './interfaces';
-import { IConnectionList, IDeletedConnectionsRecord } from '@credebl/common/interfaces/connection.interface';
+import { IConnectionList, IDeletedConnectionsRecord, orgAgents } from '@credebl/common/interfaces/connection.interface';
 import { AgentConnectionSearchCriteria, IConnectionDetailsById, IConnectionSearchCriteria } from '../interfaces/IConnectionSearch.interface';
 import { BasicMessageDto, QuestionDto } from './dtos/question-answer.dto';
 // eslint-disable-next-line camelcase
-import { org_agents, user } from '@prisma/client';
+import { user } from '@prisma/client';
 @Injectable()
 export class ConnectionService extends BaseService {
   constructor(@Inject('NATS_CLIENT') private readonly connectionServiceProxy: ClientProxy) {
@@ -39,7 +39,7 @@ export class ConnectionService extends BaseService {
     connectionDto: ConnectionDto,
     orgId: string
   // eslint-disable-next-line camelcase
-  ): Promise<org_agents> {
+  ): Promise<orgAgents> {
     const payload = { connectionDto, orgId };
     return this.sendNatsMessage(this.connectionServiceProxy, 'webhook-get-connection', payload);
   }
