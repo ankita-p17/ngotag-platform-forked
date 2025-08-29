@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma } from '@prisma/client';
 
 export interface IUserOrgRoles {
   id: string
@@ -61,7 +61,7 @@ interface ISchema {
 }
 
 interface IOrgAgents {
-  agent_invitations: IAgentInvitation[];
+  agent_invitations?: IAgentInvitation[];
   ledgers: ILedgers;
   org_agent_type: IOrgAgentType;
 }
@@ -243,4 +243,11 @@ export interface IOrgRoleDetails {
   lastChangedDateTime: Date;
   lastChangedBy: string;
   deletedAt: Date;
+}
+
+export interface IVerificationMethod {
+  id: string;
+  type: string;
+  controller: string;
+  publicKeyBase58: string;
 }

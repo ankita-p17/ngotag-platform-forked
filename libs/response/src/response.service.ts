@@ -4,11 +4,11 @@ import { Injectable } from '@nestjs/common';
 export class ResponseService {
 
     message: string;
-    data: any;
+    data: unknown;
     success: boolean;
     code: number;
 
-    public response(message: string, success: boolean, data?: any, code?: number): ResponseService {
+    public response(message: string, success: boolean, data?: unknown, code?: number): ResponseService {
         // This function should be static so no need to create object in every method not changing code because of 
         // does not know impact of it on how many function and files.
         //Todo: function should be static.
