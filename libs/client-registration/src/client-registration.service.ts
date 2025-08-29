@@ -1,3 +1,7 @@
+/* eslint-disable no-useless-catch */
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable camelcase */
 
 import {
   BadRequestException,
@@ -35,7 +39,7 @@ export class ClientRegistrationService {
   ) {
     try {
       const url = await this.keycloakUrlService.createUserURL(realm);
-      const registerUserResponse = await this.commonService.httpPost(
+      await this.commonService.httpPost(
         url,
         userDetails,
         this.getAuthHeader(token)
@@ -105,7 +109,7 @@ export class ClientRegistrationService {
       }
     };
 
-    const registerUserResponse = await this.commonService.httpPost(
+    await this.commonService.httpPost(
       await this.keycloakUrlService.createUserURL(realm),
       payload,
       this.getAuthHeader(token)
@@ -117,8 +121,7 @@ export class ClientRegistrationService {
     );
     const userid = getUserResponse[0].id;
 
-
-    const setPasswordResponse = await this.resetPasswordOfKeycloakUser(realm, user.password, userid, token);
+    await this.resetPasswordOfKeycloakUser(realm, user.password, userid, token);
 
     return {
       keycloakUserId: getUserResponse[0].id
@@ -226,6 +229,7 @@ export class ClientRegistrationService {
         );
       }
 
+      // eslint-disable-next-line prefer-destructuring
       const payload = decoded['payload'];
 
       const userInfoResponse = await this.commonService.httpGet(
@@ -296,6 +300,7 @@ export class ClientRegistrationService {
         await this.keycloakUrlService.GetClientURL(realmName, clientId),
         this.getAuthHeader(token)
       );
+      // eslint-disable-next-line prefer-destructuring
       const { id } = getClientResponse[0];
       const client_id = getClientResponse[0].clientId;
 
@@ -620,6 +625,7 @@ export class ClientRegistrationService {
         createClientResponse
       )}`
     );
+    // eslint-disable-next-line prefer-destructuring
     const { id } = getClientResponse[0];
     const client_id = getClientResponse[0].clientId;
 
@@ -688,6 +694,7 @@ export class ClientRegistrationService {
   }
 
   async authorizeApi(clientId: string, scope: string[], token: string) {
+    // eslint-disable-next-line no-useless-catch
     try {
       const existingGrantsResponse = await this.commonService.httpGet(
         `${process.env.KEYCLOAK_DOMAIN}${CommonConstants.URL_KEYCLOAK_MANAGEMENT_GRANTS}`,
@@ -708,6 +715,7 @@ export class ClientRegistrationService {
       // Grant wasn't found, so we need to create it
       if (!grantResponse.data) {
         const payload = {
+          // eslint-disable-next-line camelcase
           client_id: clientId,
           audience: process.env.AUTH0_AUDIENCE,
           scope

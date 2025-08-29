@@ -6,7 +6,6 @@ import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { getNatsOptions } from '@credebl/common/nats.config';
 import { CommonConstants } from '@credebl/common/common.constant';
 
-
 async function bootstrap(): Promise<void> {
   const app = await NestFactory.createMicroservice<MicroserviceOptions>(LedgerModule, {
     transport: Transport.NATS,
