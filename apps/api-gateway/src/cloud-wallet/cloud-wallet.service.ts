@@ -18,17 +18,6 @@ export class CloudWalletService extends BaseService {
   async configureBaseWallet(
     cloudBaseWalletConfigure: ICloudBaseWalletConfigure
   ): Promise<IGetStoredWalletInfo> {
-    // const orgAgentPayload: Prisma.org_agentsCreateInput = {
-    //   createdBy: cloudBaseWalletConfigure.orgId,
-    //   webhookUrl: cloudBaseWalletConfigure.webhookUrl,
-    //   lastChangedBy: cloudBaseWalletConfigure.orgId,
-    //   organisation: {
-    //     connect: {
-    //         id: cloudBaseWalletConfigure.orgId
-    //     }
-    //   }
-    // };
-    // await this.sendNatsMessage(this.cloudWalletServiceProxy, 'create-new-org-agent', orgAgentPayload);
     return this.sendNatsMessage(this.cloudWalletServiceProxy, 'configure-cloud-base-wallet', cloudBaseWalletConfigure);
   }
 
