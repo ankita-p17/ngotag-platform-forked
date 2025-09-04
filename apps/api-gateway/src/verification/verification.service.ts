@@ -9,7 +9,8 @@ import { IPresentation, IProofRequest, IProofRequestSearchCriteria } from './int
 import { IProofPresentation } from './interfaces/verification.interface';
 // To do make a similar interface in API-gateway
 import { IRequestProof } from 'apps/verification/src/interfaces/verification.interface';
-import { user } from '@prisma/client';
+// eslint-disable-next-line camelcase
+import { org_agents, user } from '@prisma/client';
 
 
 @Injectable()
@@ -80,7 +81,8 @@ export class VerificationService extends BaseService {
         return this.sendNatsMessage(this.verificationServiceProxy, 'verify-presentation', payload);
     }
 
-    webhookProofPresentation(orgId: string, proofPresentationPayload: WebhookPresentationProofDto): Promise<object> {
+    // eslint-disable-next-line camelcase
+    webhookProofPresentation(orgId: string, proofPresentationPayload: WebhookPresentationProofDto): Promise<org_agents> {
         const payload = { orgId, proofPresentationPayload };
         return this.sendNatsMessage(this.verificationServiceProxy, 'webhook-proof-presentation', payload);
     }

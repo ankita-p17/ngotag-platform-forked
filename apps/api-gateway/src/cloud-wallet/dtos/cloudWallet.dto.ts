@@ -1,4 +1,4 @@
-import { IsBoolean, IsInt, IsNotEmpty, IsOptional, IsString, Matches, MaxLength } from 'class-validator';
+import { IsBoolean, IsInt, IsNotEmpty, IsOptional, IsString, Matches, MaxLength, Min } from 'class-validator';
 
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { IsNotSQLInjection, trim } from '@credebl/common/cast.helper';
@@ -53,19 +53,16 @@ export class ReceiveInvitationUrlDTO {
   
     @ApiPropertyOptional()
     @IsBoolean({ message: 'autoAcceptConnection must be a boolean' })
-    @Transform(({ value }) => trim(value))
     @IsOptional()
     autoAcceptConnection?: boolean;
   
     @ApiPropertyOptional()
     @IsBoolean({ message: 'autoAcceptInvitation must be a boolean' })
-    @Transform(({ value }) => trim(value))
     @IsOptional()
     autoAcceptInvitation?: boolean;
   
     @ApiPropertyOptional()
     @IsBoolean({ message: 'reuseConnection must be a boolean' })
-    @Transform(({ value }) => trim(value))
     @IsOptional()
     reuseConnection?: boolean;
   
@@ -184,11 +181,37 @@ export class ReceiveInvitationUrlDTO {
     @IsOptional()
     @Transform(({ value }) => trim(value))
     @IsString({ message: 'endorser did must be in string format.' })
-    endorserDid?: string; 
+    endorserDid?: string;
+    
+    @ApiPropertyOptional({example: 'false'})
+    @IsOptional()
+    @IsBoolean({ message: 'isDefault must be boolean value.' })
+    isDefault?: boolean = false;
 
     email?: string;
     
     userId?: string;
+}
+
+  export class ExportCloudWalletDto {
+
+
+    @ApiPropertyOptional({ example: 'XzFjo1RTZ2h9UVFCnPUyaQ' })
+    @Transform(({ value }) => trim(value))
+    @IsNotEmpty({ message: 'passKey is required' })
+    @IsString({ message: 'passKey must be in string format.' })
+    passKey: string;
+
+    @ApiPropertyOptional({ example: 'walletID' })
+    @Transform(({ value }) => trim(value))
+    @IsNotEmpty({ message: 'walletID is required' })
+    @IsString({ message: 'walletID must be in string format.' })
+    walletID: string;
+
+
+    email: string;
+    
+    userId: string;
 }
 
 export class CredentialListDto {
@@ -263,4 +286,25 @@ export class BasicMessageDTO {
   userId?: string;
 
   connectionId: string;
+}
+
+export class UpdateBaseWalletDto {
+
+   @ApiProperty({
+      example: 5,
+      description: 'Maximum number of sub wallets allowed'
+    })
+    @IsInt()
+    @Min(1)
+    maxSubWallets: number;
+
+    @ApiPropertyOptional({ default: true })
+    @IsBoolean({ message: 'isActive must be a boolean' })
+    @IsOptional()
+    isActive: boolean = true;
+
+    email?: string;
+    userId?: string;
+    walletId: string;
+
 }

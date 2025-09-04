@@ -24,7 +24,7 @@ import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { IConnectionList, ICreateConnectionUrl, IDeletedConnectionsRecord } from '@credebl/common/interfaces/connection.interface';
 import { IConnectionDetailsById } from 'apps/api-gateway/src/interfaces/IConnectionSearch.interface';
 import { IBasicMessage, IQuestionPayload } from './interfaces/messaging.interfaces';
-import { RecordType, user } from '@prisma/client';
+import { org_agents, RecordType, user } from '@prisma/client';
 import { UserActivityRepository } from 'libs/user-activity/repositories';
 import { agent_invitations } from '@prisma/client';
 @Injectable()
@@ -43,10 +43,10 @@ export class ConnectionService {
    * @param orgId
    * @returns Callback URL for connection and created connections details
    */
-  async getConnectionWebhook(payload: ICreateConnection): Promise<object> {
+  async getConnectionWebhook(payload: ICreateConnection): Promise<org_agents> {
     try {
-      const saveConnectionDetails = await this.connectionRepository.saveConnectionWebhook(payload);
-      return saveConnectionDetails;
+      const orgAgent = await this.connectionRepository.saveConnectionWebhook(payload);
+      return orgAgent;
     } catch (error) {
       this.logger.error(`[getConnectionWebhook] - error in fetch connection webhook: ${error}`);
       throw new RpcException(error.response ? error.response : error);
@@ -649,15 +649,14 @@ export class ConnectionService {
       if (!agentDetails) {
         throw new NotFoundException(ResponseMessages.connection.error.agentEndPointNotFound);
       }
-      
-      this.logger.log(`logoUrl:::, ${organisation.logoUrl}`);
-      let legacyinvitationDid;
+
+      let legacyInvitationDid;
       if (IsReuseConnection) {
         const invitation: agent_invitations = await this.connectionRepository.getInvitationDidByOrgId(orgId);
-        legacyinvitationDid = invitation?.invitationDid ?? undefined;
-        this.logger.debug('legacyinvitationDid:', legacyinvitationDid);
+        legacyInvitationDid = invitation?.invitationDid ?? undefined;
+        this.logger.debug('legacyInvitationDid:', legacyInvitationDid);
       }
-      const connectionInvitationDid = invitationDid ? invitationDid : legacyinvitationDid;
+      const connectionInvitationDid = invitationDid ? invitationDid : legacyInvitationDid;
 
       this.logger.log('connectionInvitationDid:', connectionInvitationDid);
 

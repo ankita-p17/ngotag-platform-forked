@@ -1,11 +1,11 @@
 import { IResponse } from '@credebl/common/interfaces/response.interface';
 import { ResponseMessages } from '@credebl/common/response-messages';
-import { Controller, Post, Logger, Body, HttpStatus, Res, UseFilters, UseGuards, Get, Param, Query, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Logger, Body, HttpStatus, Res, UseFilters, UseGuards, Get, Param, Query, BadRequestException, Delete, Patch } from '@nestjs/common';
 import { ApiBearerAuth, ApiForbiddenResponse, ApiOperation, ApiQuery, ApiResponse, ApiTags, ApiUnauthorizedResponse } from '@nestjs/swagger';
 import { ForbiddenErrorDto } from '../dtos/forbidden-error.dto';
 import { UnauthorizedErrorDto } from '../dtos/unauthorized-error.dto';
 import { CloudWalletService } from './cloud-wallet.service';
-import { AcceptOfferDto, BasicMessageDTO, CreateCloudWalletDidDto, CreateCloudWalletDto, CredentialListDto, GetAllCloudWalletConnectionsDto, ReceiveInvitationUrlDTO } from './dtos/cloudWallet.dto';
+import { AcceptOfferDto, BasicMessageDTO, CreateCloudWalletDidDto, CreateCloudWalletDto, CredentialListDto, ExportCloudWalletDto, GetAllCloudWalletConnectionsDto, ReceiveInvitationUrlDTO, UpdateBaseWalletDto } from './dtos/cloudWallet.dto';
 import { Response } from 'express';
 import { CustomExceptionFilter } from 'apps/api-gateway/common/exception-handler';
 import { ApiResponseDto } from '../dtos/apiResponse.dto';
@@ -18,8 +18,11 @@ import { validateDid } from '@credebl/common/did.validator';
 import { CommonConstants } from '@credebl/common/common.constant';
 import { UserRoleGuard } from '../authz/guards/user-role.guard';
 import { AcceptProofRequestDto } from './dtos/accept-proof-request.dto';
-import { IBasicMessage, IConnectionDetailsById, ICredentialDetails, IGetProofPresentation, IGetProofPresentationById, IWalletDetailsForDidList } from '@credebl/common/interfaces/cloud-wallet.interface';
+import { IBasicMessage, IConnectionDetailsById, ICredentialDetails, IGetCredentialsForRequest, IGetProofPresentation, IGetProofPresentationById, IProofPresentationPayloadWithCred, IProofPresentationDetails, IWalletDetailsForDidList, IW3cCredentials, ICheckCloudWalletStatus, IDeleteCloudWallet } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { CreateConnectionDto } from './dtos/create-connection.dto';
+import { ProofWithCredDto } from './dtos/accept-proof-request-with-cred.dto';
+import { DeclineProofRequestDto } from './dtos/decline-proof-request.dto';
+import { SelfAttestedCredentialDto } from './dtos/self-attested-credential.dto';
 
 
 @UseFilters(CustomExceptionFilter)
@@ -39,7 +42,7 @@ export class CloudWalletController {
         * @param cloudBaseWalletConfigure
         * @param user 
         * @param res 
-        * @returns sucess message
+        * @returns Success message
     */
     @Post('/configure/base-wallet')
     @ApiOperation({ summary: 'Configure base wallet', description: 'Configure base wallet' })
@@ -69,7 +72,7 @@ export class CloudWalletController {
         * Create cloud wallet
         * @param cloudWalletDetails 
         * @param res 
-        * @returns Sucess message and wallet details
+        * @returns Success message and wallet details
     */
      @Post('/create-wallet')
      @ApiOperation({ summary: 'Create cloud wallet', description: 'Create cloud wallet' })
@@ -94,11 +97,122 @@ export class CloudWalletController {
  
      }
 
+    /**
+        * Delete cloud wallet 
+        * @param res 
+        * @returns Success message
+    */
+     @Delete('/delete-wallet')
+     @ApiOperation({ summary: 'Delete cloud wallet', description: 'Delete cloud wallet' })
+     @ApiResponse({ status: HttpStatus.OK, type: ApiResponseDto })
+     @ApiBearerAuth()
+     @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+     async deleteCloudWallet(
+         @Res() res: Response,
+         @User() user: user,
+         @Query('deleteHolder') deleteHolder: boolean = false
+     ): Promise<Response> {
+         const {id} = user;
+
+         const cloudWalletDetails: IDeleteCloudWallet = {
+            userId: id,
+            deleteHolder
+         };
+
+        await this.cloudWalletService.deleteCloudWallet(cloudWalletDetails);
+        const finalResponse: IResponse = {
+             statusCode: HttpStatus.OK,
+             message: ResponseMessages.cloudWallet.success.delete
+         };
+         return res.status(HttpStatus.OK).json(finalResponse);
+ 
+     }
+
+
+    /**
+        * Check cloud wallet status 
+        * @returns success message
+    */
+    @Get('/check-cloud-wallet-status')
+    @ApiOperation({ summary: 'Accept proof request', description: 'Accept proof request' })
+    @ApiResponse({ status: HttpStatus.CREATED, description: 'Created', type: ApiResponseDto })
+    @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+    async checkCloudWalletStatus(
+        @Res() res: Response,
+        @User() user: user
+    ): Promise<Response> {
+        const { id, email } = user;
+        
+        const checkCloudWalletStatus : ICheckCloudWalletStatus = {
+            userId: id,
+            email
+        };
+        try {
+            const checkCloudWalletStatusRes = await this.cloudWalletService.checkCloudWalletStatus(checkCloudWalletStatus);
+        const finalResponse: IResponse = {
+            statusCode: HttpStatus.OK,
+            message: ResponseMessages.cloudWallet.success.checkCloudWalletStatus,
+            data: checkCloudWalletStatusRes
+        };
+        return res.status(HttpStatus.CREATED).json(finalResponse);
+        } catch (error) {
+            if ('P2025' === error?.code) {
+                return res.status(HttpStatus.NOT_FOUND).json({message:'Not found'});
+            }
+            throw error;
+        }
+        
+        
+    }
+
+     @Get('get-active-base-wallet')
+     @ApiOperation({ summary: 'Create cloud wallet', description: 'Create cloud wallet' })
+     @ApiResponse({ status: HttpStatus.CREATED, description: 'Created', type: ApiResponseDto })
+     @ApiBearerAuth()
+     @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+     async getBaseWalletDetails(
+         @Res() res: Response,
+         @User() user: user
+     ): Promise<Response> {
+         const baseWalletData = await this.cloudWalletService.getBaseWalletDetails(user);
+         const finalResponse: IResponse = {
+             statusCode: HttpStatus.OK,
+             message: ResponseMessages.cloudWallet.success.getBaseWalletInfo,
+             data: baseWalletData
+         };
+         return res.status(HttpStatus.CREATED).json(finalResponse);
+     }
+
+     @Patch('/base-wallet/:walletId')
+     @ApiOperation({ summary: 'Update base wallet', description: 'Update base wallet' })
+     @ApiResponse({ status: HttpStatus.CREATED, description: 'Created', type: ApiResponseDto })
+     @ApiBearerAuth()
+     @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+     async updateBaseWalletDetails(
+         @Param('walletId') walletId:string,
+         @Body() updateBaseWalletDto:UpdateBaseWalletDto,
+         @User() user: user,
+         @Res() res: Response
+     ): Promise<Response> {
+
+        const {email, id} = user;
+        updateBaseWalletDto.email = email;
+        updateBaseWalletDto.userId = id;
+        updateBaseWalletDto.walletId = walletId;
+         const baseWalletData = await this.cloudWalletService.updateBaseWalletDetails(updateBaseWalletDto);
+         const finalResponse: IResponse = {
+             statusCode: HttpStatus.OK,
+             message: ResponseMessages.cloudWallet.success.getBaseWalletInfo,
+             data: baseWalletData
+         };
+         return res.status(HttpStatus.CREATED).json(finalResponse);
+     }
+
 
     /**
         * Accept proof request 
         * @param acceptProofRequest
-        * @returns sucess message
+        * @returns success message
     */
     @Post('/proofs/accept-request')
     @ApiOperation({ summary: 'Accept proof request', description: 'Accept proof request' })
@@ -123,12 +237,70 @@ export class CloudWalletController {
     }
 
     /**
+        * Decline proof request 
+        * @param DeclineProofRequest
+        * @returns success message
+    */
+    @Post('/proofs/decline-request')
+    @ApiOperation({ summary: 'Accept proof request', description: 'Accept proof request' })
+    @ApiResponse({ status: HttpStatus.CREATED, description: 'Created', type: ApiResponseDto })
+    @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+    async declineProofRequest(
+        @Res() res: Response,
+        @Body() declineProofRequest: DeclineProofRequestDto,
+        @User() user: user
+    ): Promise<Response> {
+        const { id, email } = user;
+        declineProofRequest.userId = id;
+        declineProofRequest.email = email;
+
+        const acceptProofRequestDetails = await this.cloudWalletService.declineProofRequest(declineProofRequest);
+        const finalResponse: IResponse = {
+            statusCode: HttpStatus.CREATED,
+            message: ResponseMessages.cloudWallet.success.declineProofRequest,
+            data: acceptProofRequestDetails
+        };
+        return res.status(HttpStatus.CREATED).json(finalResponse);
+    }
+
+    /**
         * Get proof presentation by proof id
         * @param proofRecordId 
         * @param res 
-        * @returns sucess message
+        * @returns success message
     */
-    @Get('/proofs/:proofRecordId')
+    @Post('/proofs/acceptRequestWithCred')
+    @ApiOperation({ summary: 'Get proof presentation by Id', description: 'Get proof presentation by Id' })
+    @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: ApiResponseDto })
+    @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+    async acceptRequestWithCred(
+        @Body() proofDto: ProofWithCredDto,
+        @Res() res: Response,
+        @User() user: user
+    ): Promise<Response> {
+        const { id, email } = user;
+        const proofPresentationPayloadWithCred: IProofPresentationPayloadWithCred = {
+            userId: id,
+            email,
+            proof: proofDto
+        };
+
+        const proofDetails = await this.cloudWalletService.submitProofWithCred(proofPresentationPayloadWithCred);
+        const finalResponse: IResponse = {
+            statusCode: HttpStatus.OK,
+            message: ResponseMessages.cloudWallet.success.getProofById,
+            data: proofDetails
+        };
+        return res.status(HttpStatus.OK).json(finalResponse);
+    }
+
+    /**
+        * Submit proof presentation
+        * @param proofRecordId 
+        * @param res 
+        * @returns success message
+    */
+    @Post('/proofs/:proofRecordId')
     @ApiOperation({ summary: 'Get proof presentation by Id', description: 'Get proof presentation by Id' })
     @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: ApiResponseDto })
     @UseGuards(AuthGuard('jwt'), UserRoleGuard)
@@ -154,11 +326,43 @@ export class CloudWalletController {
         return res.status(HttpStatus.OK).json(finalResponse);
     }
 
+  /**
+   * Get Credentials for request by proof id
+   * @param proofRecordId
+   * @param res
+   * @returns success message
+   */
+  @Get('/credentialsForRequest/:proofRecordId')
+  @ApiOperation({ summary: 'Get proof presentation by Id', description: 'Get proof presentation by Id' })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: ApiResponseDto })
+  @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+  async getCredentialsForRequest(
+    @Param('proofRecordId') proofRecordId: string,
+    @Res() res: Response,
+    @User() user: user
+  ): Promise<Response> {
+    const { id, email } = user;
+
+    const proofPresentationByIdPayload: IGetCredentialsForRequest = {
+      userId: id,
+      email,
+      proofRecordId
+    };
+
+    const getProofDetails = await this.cloudWalletService.getCredentialsForRequest(proofPresentationByIdPayload);
+    const finalResponse: IResponse = {
+      statusCode: HttpStatus.OK,
+      message: ResponseMessages.cloudWallet.success.getCredentialsByProofId,
+      data: getProofDetails
+    };
+    return res.status(HttpStatus.OK).json(finalResponse);
+  }
+
     /**
         * Get proof presentations
         * @param threadId 
         * @param res 
-        * @returns sucess message
+        * @returns success message
     */
     @Get('/proofs')
     @ApiOperation({ summary: 'Get proof presentation', description: 'Get proof presentation' })
@@ -190,6 +394,44 @@ export class CloudWalletController {
         };
         return res.status(HttpStatus.OK).json(finalResponse);
     }
+
+
+  /**
+   * Get credential Format data by credential id
+   * @param credentialListQueryOptions
+   * @param res
+   * @returns Credential list
+   */
+  @Get('/credentialFormatData/:credentialRecordId')
+  @ApiOperation({
+    summary: 'Get credential by credential record Id',
+    description: 'Get credential by credential record Id'
+  })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: ApiResponseDto })
+  @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+  async getCredentialFormatDataByCredentialRecordId(
+    @Param('credentialRecordId') credentialRecordId: string,
+    @Res() res: Response,
+    @User() user: user
+  ): Promise<Response> {
+    const { id, email } = user;
+
+    const credentialDetails: ICredentialDetails = {
+      userId: id,
+      email,
+      credentialRecordId
+    };
+
+    const credentialsDetailResponse = await this.cloudWalletService.getCredentialFormatDataByCredentialRecordId(
+      credentialDetails
+    );
+    const finalResponse: IResponse = {
+      statusCode: HttpStatus.OK,
+      message: ResponseMessages.cloudWallet.success.credentialByRecordId,
+      data: credentialsDetailResponse
+    };
+    return res.status(HttpStatus.OK).json(finalResponse);
+  }
 
       /**
         * Receive invitation by URL
@@ -289,25 +531,62 @@ export class CloudWalletController {
     return res.status(HttpStatus.CREATED).json(finalResponse);
   }
 
+
+    /**
+   * Create did
+   * @param orgId
+   * @returns did
+   */
+  @Post('/export-wallet')
+  @ApiOperation({
+    summary: 'Export Wallet',
+    description: 'Export Wallet'
+  })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+  @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: ApiResponseDto })
+  async exportWallet(
+    @Body() exportWallet: ExportCloudWalletDto,
+    @User() user: user,
+    @Res() res: Response
+  ): Promise<Response> {
+    const {email, id} = user;
+    exportWallet.email = email;
+    exportWallet.userId = id;
+
+    const exportWalletDetails = await this.cloudWalletService.exportWallet(exportWallet);
+
+    const finalResponse: IResponse = {
+      statusCode: HttpStatus.OK,
+      message: ResponseMessages.agent.success.exportWallet,
+      data: exportWalletDetails
+    };
+
+    return res.status(HttpStatus.CREATED).json(finalResponse);
+  }
+  
+
    /**
         * Get DID list by tenant id
         * @param tenantId 
         * @param res 
         * @returns DID list
     */
-   @Get('/did')
+   @Get('/did/:isDefault')
    @ApiOperation({ summary: 'Get DID list from wallet', description: 'Get DID list from wallet' })
    @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: ApiResponseDto })
    @UseGuards(AuthGuard('jwt'), UserRoleGuard)
    async getDidList(
        @Res() res: Response,
-       @User() user: user
+       @User() user: user,
+       @Param('isDefault') isDefault: boolean = false
    ): Promise<Response> {
        const { id, email } = user;
 
        const walletDetails: IWalletDetailsForDidList = {
            userId: id,
-           email
+           email,
+           isDefault
        };
 
        const didListDetails = await this.cloudWalletService.getDidList(walletDetails);
@@ -322,7 +601,7 @@ export class CloudWalletController {
    /**
         * Accept proof request 
         * @param CreateConnectionDto
-        * @returns sucess message
+        * @returns success message
     */
    @Post('/connections/invitation')
    @ApiOperation({ summary: 'Create connection invitation for cloud wallet', description: 'Create connection invitation' })
@@ -408,6 +687,33 @@ export class CloudWalletController {
    }
 
     /**
+        * Create self-attested credential 
+        * @param SelfAttestedCredentialDto
+        * @returns success message
+    */
+   @Post('/credentials/w3c/self-attested')
+   @ApiOperation({ summary: 'Create self-attested W3C credential for cloud wallet', description: 'Create self-attested W3C credential for cloud wallet' })
+   @ApiResponse({ status: HttpStatus.CREATED, description: 'Success', type: ApiResponseDto })
+   @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+   async createSelfAttestedW3cCredential(
+       @Res() res: Response,
+       @Body() selfAttestedCredentialDto: SelfAttestedCredentialDto,
+       @User() user: user
+   ): Promise<Response> {
+       const { id, email } = user;
+       selfAttestedCredentialDto.userId = id;
+       selfAttestedCredentialDto.email = email;
+
+       const selfAttestedCredential = await this.cloudWalletService.createSelfAttestedW3cCredential(selfAttestedCredentialDto);
+       const finalResponse: IResponse = {
+           statusCode: HttpStatus.CREATED,
+           message: ResponseMessages.cloudWallet.success.createSelfAttestedW3cCredential,
+           data: selfAttestedCredential
+       };
+       return res.status(HttpStatus.CREATED).json(finalResponse);
+   }
+
+    /**
         * Get credential list by tenant id
         * @param credentialListQueryOptions 
         * @param res 
@@ -435,6 +741,35 @@ export class CloudWalletController {
         };
         return res.status(HttpStatus.OK).json(finalResponse);
     }
+
+     /**
+        * Get W3C credential list by tenant id
+        * @param res 
+        * @returns Credential list
+    */
+     @Get('/credentials/w3c')
+     @ApiOperation({ summary: 'Get W3C credential list for cloud wallet', description: 'Get W3C credential list for cloud wallet' })
+     @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: ApiResponseDto })
+     @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+     async getAllW3cCredentials(
+         @Res() res: Response,
+         @User() user: user
+     ): Promise<Response> {
+         const { id, email } = user;
+  
+         const credentialDetail: IW3cCredentials = {
+            userId: id,
+            email
+         };
+
+         const w3cCredentials = await this.cloudWalletService.getAllW3cCredentials(credentialDetail);
+         const finalResponse: IResponse = {
+             statusCode: HttpStatus.OK,
+             message: ResponseMessages.cloudWallet.success.credentials,
+             data: w3cCredentials
+         };
+         return res.status(HttpStatus.OK).json(finalResponse);
+     }
 
     /**
         * Get credential list by tenant id
@@ -467,6 +802,148 @@ export class CloudWalletController {
         };
         return res.status(HttpStatus.OK).json(finalResponse);
     }
+
+     /**
+        * Get W3C credential by Record Id
+        * @param credentialListQueryOptions 
+        * @param res 
+        * @returns Credential Detail
+    */
+     @Get('/credential/w3c/:credentialRecordId')
+     @ApiOperation({ summary: 'Get credential by credential record Id', description: 'Get credential by credential record Id' })
+     @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: ApiResponseDto })
+     @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+     async getW3cCredentialByCredentialRecordId(
+         @Param('credentialRecordId') credentialRecordId: string,
+         @Res() res: Response,
+         @User() user: user
+     ): Promise<Response> {
+         const { id, email } = user;
+  
+         const credentialDetails: IW3cCredentials = {
+             userId: id,
+             email,
+             credentialRecordId
+         };
+ 
+         const w3cCredential = await this.cloudWalletService.getW3cCredentialByCredentialRecordId(credentialDetails);
+         const finalResponse: IResponse = {
+             statusCode: HttpStatus.OK,
+             message: ResponseMessages.cloudWallet.success.credentialByRecordId,
+             data: w3cCredential
+         };
+         return res.status(HttpStatus.OK).json(finalResponse);
+     }
+  /**
+   * Get credential Format data by credential id
+   * @param credentialListQueryOptions
+   * @param res
+   * @returns Credential list
+   */
+  @Get('/proof-formdata/:proofRecordId')
+  @ApiOperation({
+    summary: 'Get proof presentation by record Id',
+    description: 'Get proof presentation by record Id'
+  })
+  @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: ApiResponseDto })
+  @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+  async getProofFormatDataByProofRecordId(
+    @Param('proofRecordId') proofRecordId: string,
+    @Res() res: Response,
+    @User() user: user
+  ): Promise<Response> {
+    const { id, email } = user;
+
+    const proofPresentationDetails: IProofPresentationDetails = {
+      userId: id,
+      email,
+      proofRecordId
+    };
+
+    const proofDetailResponse = await this.cloudWalletService.getProofFormatDataByProofRecordId(
+      proofPresentationDetails
+    );
+    const finalResponse: IResponse = {
+      statusCode: HttpStatus.OK,
+      message: ResponseMessages.cloudWallet.success.proofPresentationByRecordId,
+      data: proofDetailResponse
+    };
+    return res.status(HttpStatus.OK).json(finalResponse);
+  }
+
+/**
+   * Delete credential by credential id
+   * @param credentialListQueryOptions
+   * @param res
+   * @returns deleted credential
+   */
+@Delete('/credential/:credentialRecordId')
+@ApiOperation({
+  summary: 'Get credential by credential record Id',
+  description: 'Get credential by credential record Id'
+})
+@ApiResponse({ status: HttpStatus.OK, description: 'Success', type: ApiResponseDto })
+@UseGuards(AuthGuard('jwt'), UserRoleGuard)
+async deleteCredentialByCredentialRecordId(
+  @Param('credentialRecordId') credentialRecordId: string,
+  @Res() res: Response,
+  @User() user: user
+): Promise<Response> {
+  const { id, email } = user;
+
+  const credentialDetails: ICredentialDetails = {
+    userId: id,
+    email,
+    credentialRecordId
+  };
+
+  const connectionDetailResponse = await this.cloudWalletService.deleteCredentialByCredentialRecordId(
+    credentialDetails
+  );
+  const finalResponse: IResponse = {
+    statusCode: HttpStatus.OK,
+    message: ResponseMessages.cloudWallet.success.deleteCredential,
+    data: connectionDetailResponse
+  };
+  return res.status(HttpStatus.OK).json(finalResponse);
+}
+
+/**
+   * Delete W3C credential by credential id
+   * @param credentialListQueryOptions
+   * @param res
+   * @returns deleted W3C credential
+   */
+@Delete('/credential/w3c/:credentialRecordId')
+@ApiOperation({
+  summary: 'Get credential by credential record Id',
+  description: 'Get credential by credential record Id'
+})
+@ApiResponse({ status: HttpStatus.OK, description: 'Success', type: ApiResponseDto })
+@UseGuards(AuthGuard('jwt'), UserRoleGuard)
+async deleteW3cCredentialByCredentialRecordId(
+  @Param('credentialRecordId') credentialRecordId: string,
+  @Res() res: Response,
+  @User() user: user
+): Promise<Response> {
+  const { id, email } = user;
+
+  const credentialDetails: ICredentialDetails = {
+    userId: id,
+    email,
+    credentialRecordId
+  };
+
+  const connectionDetailResponse = await this.cloudWalletService.deleteW3cCredentialByCredentialRecordId(
+    credentialDetails
+  );
+  const finalResponse: IResponse = {
+    statusCode: HttpStatus.OK,
+    message: ResponseMessages.cloudWallet.success.deleteCredential,
+    data: connectionDetailResponse
+  };
+  return res.status(HttpStatus.OK).json(finalResponse);
+}
 
     /**
         * Get basic-message by connection id

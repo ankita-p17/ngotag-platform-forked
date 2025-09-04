@@ -7,7 +7,7 @@ import { ClientDetails, FileParameter, IssuanceDto, OOBCredentialDtoWithEmail, O
 import { FileExportResponse, IIssuedCredentialSearchParams, IReqPayload, ITemplateFormat, IssueCredentialType, UploadedFileDetails } from './interfaces';
 import { ICredentialOfferResponse, IDeletedIssuanceRecords, IIssuedCredential } from '@credebl/common/interfaces/issuance.interface';
 import { IssueCredentialDto } from './dtos/multi-connection.dto';
-import { user } from '@prisma/client';
+import { org_agents, user } from '@prisma/client';
 @Injectable()
 export class IssuanceService extends BaseService {
 
@@ -52,9 +52,7 @@ export class IssuanceService extends BaseService {
         return this.sendNats(this.issuanceProxy, 'get-issued-credentials-by-credentialDefinitionId', payload);
     }
 
-    getIssueCredentialWebhook(issueCredentialDto: IssuanceDto, id: string): Promise<{
-        response: object;
-    }> {
+    getIssueCredentialWebhook(issueCredentialDto: IssuanceDto, id: string): Promise<{response:org_agents}> {
         const payload = { issueCredentialDto, id };
         return this.sendNats(this.issuanceProxy, 'webhook-get-issue-credential', payload);
     }
