@@ -47,7 +47,8 @@ import {
   IW3cCredentials,
   IDeleteCloudWallet,
   ICheckCloudWalletStatus,
-  IExportCloudWallet
+  IExportCloudWallet,
+  IAddConnectionType
 } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { CloudWalletRepository } from './cloud-wallet.repository';
 import { ResponseMessages } from '@credebl/common/response-messages';
@@ -720,6 +721,32 @@ export class CloudWalletService {
       const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_CONNECTION_BY_ID}${connectionId}/${tenantId}`;
 
       const connectionDetailResponse = await this.commonService.httpGet(url, { headers: { authorization: decryptedApiKey } });
+      return connectionDetailResponse;
+    } catch (error) {
+      await this.commonService.handleError(error);
+      throw error;
+    }
+  }
+
+
+    /**
+   * Add connection Type 
+   * @param connectionDetails
+   * @returns Connection Details
+   */
+  async AddConnectionTypeById(connectionDetails: IAddConnectionType): Promise<Response> {
+    try {
+      const { userId, connectionId,  connectionType} = connectionDetails;
+      const [getTenant, decryptedApiKey] = await this._commonCloudWalletInfo(userId);
+
+      const { tenantId } = getTenant;
+      const { agentEndpoint } = getTenant;
+
+      const url = `${agentEndpoint}${CommonConstants.CLOUD_WALLET_ADD_CONNECTION_TYPE}${connectionId}/${tenantId}`;
+
+      const connectionDetailResponse = await this.commonService.httpPost(url, {connectionType}, {
+        headers: { authorization: decryptedApiKey }
+      });
       return connectionDetailResponse;
     } catch (error) {
       await this.commonService.handleError(error);

@@ -2,7 +2,7 @@
 import { Controller } from '@nestjs/common'; // Import the common service in the library
 import { CloudWalletService } from './cloud-wallet.service'; // Import the common service in connection module
 import { MessagePattern } from '@nestjs/microservices'; // Import the nestjs microservices package
-import { IAcceptOffer, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, ICreateCloudWallet, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, ICreateConnection, IConnectionInvitationResponse, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest, BaseAgentInfo, ISelfAttestedCredential, IW3cCredentials, ICheckCloudWalletStatus, IDeleteCloudWallet, IExportCloudWallet } from '@credebl/common/interfaces/cloud-wallet.interface';
+import { IAcceptOffer, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, ICreateCloudWallet, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, ICreateConnection, IConnectionInvitationResponse, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest, BaseAgentInfo, ISelfAttestedCredential, IW3cCredentials, ICheckCloudWalletStatus, IDeleteCloudWallet, IExportCloudWallet, IAddConnectionType } from '@credebl/common/interfaces/cloud-wallet.interface';
 // eslint-disable-next-line camelcase
 import { cloud_wallet_user_info, user as User } from '@prisma/client';
 import { UpdateBaseWalletDto } from 'apps/api-gateway/src/cloud-wallet/dtos/cloudWallet.dto';
@@ -108,6 +108,10 @@ export class CloudWalletController {
     return this.cloudWalletService.getconnectionById(connectionDetails);
   }
 
+  @MessagePattern({ cmd: 'Add-cloud-wallet-connection--type-by-id' })
+  async addConnectionTypeById(connectionDetails: IAddConnectionType): Promise<Response> {
+    return this.cloudWalletService.AddConnectionTypeById(connectionDetails);
+  }
 
   @MessagePattern({ cmd: 'get-all-cloud-wallet-connections-list-by-id' })
   async getAllconnectionById(connectionDetails: GetAllCloudWalletConnections): Promise<Response> {

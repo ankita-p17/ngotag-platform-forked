@@ -51,6 +51,7 @@ export interface IReceiveInvitation {
   invitationUrl: string;
   email?: string;
   userId?: string;
+  connectionType?: string;
 }
 
 export interface IAcceptOffer {
@@ -489,6 +490,13 @@ export interface IW3cCredentials {
 export interface IExportCloudWallet {
   passKey: string;
   walletID: string;
+  userId: string;
+  email: string;
+}
+
+export interface IAddConnectionType {
+  connectionType: string;
+  connectionId: string;
   userId: string;
   email: string;
 }
