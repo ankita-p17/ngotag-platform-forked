@@ -308,3 +308,11 @@ export class UpdateBaseWalletDto {
     walletId: string;
 
 }
+
+export class AddConnectionTypeDto {
+  @ApiProperty({ example: 'type'})
+  @IsNotEmpty({ message: 'connectionType is required' })
+  @Transform(({ value }) => trim(value))
+  @IsString({ message: 'connectionType should be in string format.' })
+  connectionType: string;
+}

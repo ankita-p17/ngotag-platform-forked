@@ -5,7 +5,7 @@ import { ApiBearerAuth, ApiForbiddenResponse, ApiOperation, ApiQuery, ApiRespons
 import { ForbiddenErrorDto } from '../dtos/forbidden-error.dto';
 import { UnauthorizedErrorDto } from '../dtos/unauthorized-error.dto';
 import { CloudWalletService } from './cloud-wallet.service';
-import { AcceptOfferDto, BasicMessageDTO, CreateCloudWalletDidDto, CreateCloudWalletDto, CredentialListDto, ExportCloudWalletDto, GetAllCloudWalletConnectionsDto, ReceiveInvitationUrlDTO, UpdateBaseWalletDto } from './dtos/cloudWallet.dto';
+import { AcceptOfferDto, AddConnectionTypeDto, BasicMessageDTO, CreateCloudWalletDidDto, CreateCloudWalletDto, CredentialListDto, ExportCloudWalletDto, GetAllCloudWalletConnectionsDto, ReceiveInvitationUrlDTO, UpdateBaseWalletDto } from './dtos/cloudWallet.dto';
 import { Response } from 'express';
 import { CustomExceptionFilter } from 'apps/api-gateway/common/exception-handler';
 import { ApiResponseDto } from '../dtos/apiResponse.dto';
@@ -18,7 +18,7 @@ import { validateDid } from '@credebl/common/did.validator';
 import { CommonConstants } from '@credebl/common/common.constant';
 import { UserRoleGuard } from '../authz/guards/user-role.guard';
 import { AcceptProofRequestDto } from './dtos/accept-proof-request.dto';
-import { IBasicMessage, IConnectionDetailsById, ICredentialDetails, IGetCredentialsForRequest, IGetProofPresentation, IGetProofPresentationById, IProofPresentationPayloadWithCred, IProofPresentationDetails, IWalletDetailsForDidList, IW3cCredentials, ICheckCloudWalletStatus, IDeleteCloudWallet } from '@credebl/common/interfaces/cloud-wallet.interface';
+import { IBasicMessage, IConnectionDetailsById, ICredentialDetails, IGetCredentialsForRequest, IGetProofPresentation, IGetProofPresentationById, IProofPresentationPayloadWithCred, IProofPresentationDetails, IWalletDetailsForDidList, IW3cCredentials, ICheckCloudWalletStatus, IDeleteCloudWallet, IAddConnectionType } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { CreateConnectionDto } from './dtos/create-connection.dto';
 import { ProofWithCredDto } from './dtos/accept-proof-request-with-cred.dto';
 import { DeclineProofRequestDto } from './dtos/decline-proof-request.dto';
@@ -653,6 +653,42 @@ export class CloudWalletController {
        const finalResponse: IResponse = {
            statusCode: HttpStatus.OK,
            message: ResponseMessages.cloudWallet.success.connectionById,
+           data: connectionDetailResponse
+       };
+       return res.status(HttpStatus.OK).json(finalResponse);
+   }
+
+
+      /**
+        * Get connection list by tenant id and connection id
+        * @param tenantId 
+        * @param connectionId 
+        * @param res 
+        * @returns DID list
+    */
+   @Post('/add-connection-type/:connectionId')
+   @ApiOperation({ summary: 'Add connection type', description: 'Add connection type' })
+   @ApiResponse({ status: HttpStatus.OK, description: 'Success', type: ApiResponseDto })
+   @UseGuards(AuthGuard('jwt'), UserRoleGuard)
+   async addConnectionTypeById(
+       @Param('connectionId') connectionId: string,
+       @Body() addConnectionType: AddConnectionTypeDto,
+       @Res() res: Response,
+       @User() user: user
+   ): Promise<Response> {
+       const { id, email } = user;
+
+       const connectionDetails: IAddConnectionType = {
+           userId: id,
+           email,
+           connectionId,
+           ... addConnectionType
+       };
+
+       const connectionDetailResponse = await this.cloudWalletService.addConnectionTypeById(connectionDetails);
+       const finalResponse: IResponse = {
+           statusCode: HttpStatus.OK,
+           message: ResponseMessages.cloudWallet.success.addConnectionTypeById,
            data: connectionDetailResponse
        };
        return res.status(HttpStatus.OK).json(finalResponse);

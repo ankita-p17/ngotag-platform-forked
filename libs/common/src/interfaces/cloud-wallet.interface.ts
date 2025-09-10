@@ -492,3 +492,10 @@ export interface IExportCloudWallet {
   userId: string;
   email: string;
 }
+
+export interface IAddConnectionType {
+  connectionType: string;
+  connectionId: string;
+  userId: string;
+  email: string;
+}

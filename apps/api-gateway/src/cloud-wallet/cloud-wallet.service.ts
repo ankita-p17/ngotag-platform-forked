@@ -1,5 +1,5 @@
 
-import { IAcceptOffer, ICreateCloudWallet, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, ICreateConnection, IConnectionInvitationResponse, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest, BaseAgentInfo, IW3cCredentials, IDeleteCloudWallet, IExportCloudWallet, ICheckCloudWalletStatus } from '@credebl/common/interfaces/cloud-wallet.interface';
+import { IAcceptOffer, ICreateCloudWallet, ICreateCloudWalletDid, IReceiveInvitation, IAcceptProofRequest, IProofRequestRes, ICloudBaseWalletConfigure, IGetProofPresentation, IGetProofPresentationById, IGetStoredWalletInfo, IStoredWalletDetails, IWalletDetailsForDidList, IConnectionDetailsById, ITenantDetail, ICredentialDetails, ICreateConnection, IConnectionInvitationResponse, GetAllCloudWalletConnections, IBasicMessage, IBasicMessageDetails, IProofPresentationDetails, IGetCredentialsForRequest, ICredentialForRequestRes, IProofPresentationPayloadWithCred, IDeclineProofRequest, BaseAgentInfo, IW3cCredentials, IDeleteCloudWallet, IExportCloudWallet, ICheckCloudWalletStatus, IAddConnectionType } from '@credebl/common/interfaces/cloud-wallet.interface';
 import { Inject, Injectable} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 // eslint-disable-next-line camelcase
@@ -125,6 +125,13 @@ getconnectionById(
 ): Promise<Response> {
   return this.sendNatsMessage(this.cloudWalletServiceProxy, 'get-cloud-wallet-connection-by-id', connectionDetails);
 }
+
+addConnectionTypeById(
+  connectionDetails: IAddConnectionType
+): Promise<Response> {
+  return this.sendNatsMessage(this.cloudWalletServiceProxy, 'Add-cloud-wallet-connection--type-by-id', connectionDetails);
+}
+
 getAllconnectionById(
   connectionDetails: GetAllCloudWalletConnections
 ): Promise<Response> {
