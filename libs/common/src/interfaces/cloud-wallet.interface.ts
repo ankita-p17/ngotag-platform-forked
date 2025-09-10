@@ -51,6 +51,7 @@ export interface IReceiveInvitation {
   invitationUrl: string;
   email?: string;
   userId?: string;
+  connectionType?: string;
 }
 
 export interface IAcceptOffer {
