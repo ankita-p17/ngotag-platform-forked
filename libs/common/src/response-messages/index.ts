@@ -541,6 +541,7 @@ export const ResponseMessages = {
       getProofPresentation: 'Proof presentations has been successfully received.',
       didList: 'DID list fetched sucessfully',
       connectionById: 'Connection record fetched successfully',
+      addConnectionTypeById: 'Added connection Type successfully',
       credentials: 'Credentials fetched successfully',
       credentialByRecordId: 'Credential fetched successfully',
       proofPresentationByRecordId: 'Proof presentation fetched successfully',

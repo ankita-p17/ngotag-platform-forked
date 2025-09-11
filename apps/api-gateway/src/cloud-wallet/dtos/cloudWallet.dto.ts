@@ -87,6 +87,14 @@ export class ReceiveInvitationUrlDTO {
     @IsNotSQLInjection({ message: 'invitationUrl is required.' })
     invitationUrl: string;
 
+    @ApiPropertyOptional()
+    @IsString({ message: 'connectionType must be a string' })
+    @IsOptional()
+    @IsNotEmpty({ message: 'please provide valid connectionType' })
+    @Transform(({ value }) => trim(value))
+    @IsNotSQLInjection({ message: 'connectionType is required.' })
+    connectionType?: string;
+
     email?: string;
     
     userId?: string;
@@ -307,4 +315,12 @@ export class UpdateBaseWalletDto {
     userId?: string;
     walletId: string;
 
+}
+
+export class AddConnectionTypeDto {
+  @ApiProperty({ example: 'type'})
+  @IsNotEmpty({ message: 'connectionType is required' })
+  @Transform(({ value }) => trim(value))
+  @IsString({ message: 'connectionType should be in string format.' })
+  connectionType: string;
 }
