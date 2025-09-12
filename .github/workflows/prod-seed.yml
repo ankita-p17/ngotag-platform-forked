@@ -106,19 +106,35 @@ jobs:
           aws ecs register-task-definition --family ${FAMILY} --cli-input-json file://${GITHUB_WORKSPACE}/${NAME}-v_${{ github.run_number }}.json --region ${{ env.AWS_REGION }}
       
           SERVICE_INFO=$(aws ecs describe-services --services ${SERVICE_NAME} --cluster ${CLUSTER} --region ap-southeast-1)
-
-          # Check if the service exists
-           if [ -z "$SERVICE_INFO" ]; then
-            echo "Service does not exist, creating new service..."
-            # Your logic to create a new service goes here
+          
+          # Check if the service exists by counting services returned
+          SERVICE_COUNT=$(echo "$SERVICE_INFO" | jq '.services | length')
+          echo "Found ${SERVICE_COUNT} services matching ${SERVICE_NAME}"
+          
+          if [ "$SERVICE_COUNT" -eq 0 ]; then
+            echo "Service ${SERVICE_NAME} does not exist, creating new service..."
+            # Create the service with basic configuration
+            aws ecs create-service \
+              --cluster ${CLUSTER} \
+              --service-name ${SERVICE_NAME} \
+              --task-definition ${FAMILY} \
+              --desired-count 1 \
+              --launch-type FARGATE \
+              --network-configuration "awsvpcConfiguration={subnets=[subnet-0123456789abcdef0],securityGroups=[sg-0123456789abcdef0],assignPublicIp=ENABLED}" \
+              --region ap-southeast-1
+            echo "Service ${SERVICE_NAME} created successfully"
           else
-          echo "Entered existing service"
-            # Extract desired count from the stored service info
-           DESIRED_COUNT=$(echo "$SERVICE_INFO" | jq -r '.services[].desiredCount')
-           if [ "$DESIRED_COUNT" = "0" ]; then
-            DESIRED_COUNT="1"
+            echo "Service ${SERVICE_NAME} exists, updating..."
+            # Extract desired count from the existing service
+            DESIRED_COUNT=$(echo "$SERVICE_INFO" | jq -r '.services[0].desiredCount')
+            if [ "$DESIRED_COUNT" = "0" ] || [ "$DESIRED_COUNT" = "null" ]; then
+              DESIRED_COUNT="1"
             fi
+            echo "Current desired count: ${DESIRED_COUNT}"
+            
             # Update the existing service
-              REVISION=$(aws ecs describe-task-definition --task-definition ${FAMILY} --region ap-southeast-1 | jq -r '.taskDefinition.revision')
+            REVISION=$(aws ecs describe-task-definition --task-definition ${FAMILY} --region ap-southeast-1 | jq -r '.taskDefinition.revision')
+            echo "Updating service with task definition ${FAMILY}:${REVISION}"
             aws ecs update-service --cluster ${CLUSTER} --region ap-southeast-1 --service ${SERVICE_NAME} --task-definition ${FAMILY}:${REVISION} --desired-count ${DESIRED_COUNT}
-            fi
+            echo "Service ${SERVICE_NAME} updated successfully"
+          fi
