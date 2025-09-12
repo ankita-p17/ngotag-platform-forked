@@ -1,5 +1,5 @@
 {
-    "family": "PRODUCTION_SEED_TASKDEFINITON",
+    "family": "PROD_SEED_TASKDEFINITION",
     "containerDefinitions": [
         {
             "name": "seed",
@@ -22,7 +22,7 @@
                 "logDriver": "awslogs",
                 "options": {
                     "awslogs-create-group": "true",
-                    "awslogs-group": "/ecs/PRODUCTION_SEED_TASKDEFINITON",
+                    "awslogs-group": "/ecs/PROD_SEED_TASKDEFINITION",
                     "awslogs-region": "ap-southeast-1",
                     "awslogs-stream-prefix": "ecs"
                 },
