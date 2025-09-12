@@ -4,7 +4,6 @@ import { PrismaService } from '@credebl/prisma-service';
 // eslint-disable-next-line camelcase
 import {
   agent_invitations,
-  credentials,
   file_data,
   file_upload,
   org_agents,
@@ -88,6 +87,20 @@ export class IssuanceRepository {
       throw error;
     }
   }
+
+  async getOrganizationByOrgId(orgId: string): Promise<org_agents> {
+    try {
+      return this.prisma.org_agents.findFirst({
+        where: {
+          orgId
+        }
+      });
+    } catch (error) {
+      this.logger.error(`Error in getOrganization in issuance repository: ${error.message} `);
+      throw error;
+    }
+  }
+  
 
   async getInvitationDidByOrgId(orgId: string): Promise<agent_invitations> {
     try {
@@ -178,15 +191,21 @@ export class IssuanceRepository {
    * @returns Get saved credential details
    */
   // eslint-disable-next-line camelcase
-  async saveIssuedCredentialDetails(payload: IssueCredentialWebhookPayload): Promise<credentials> {
+  async saveIssuedCredentialDetails(payload: IssueCredentialWebhookPayload): Promise<org_agents> {
     try {
       let organisationId: string;
+      let agentOrg: org_agents;
       const { issueCredentialDto, id } = payload;
-
       if ('default' !== issueCredentialDto?.contextCorrelationId) {
-        const getOrganizationId = await this.getOrganizationByTenantId(issueCredentialDto?.contextCorrelationId);
-        organisationId = getOrganizationId?.orgId;
+        agentOrg = await this.getOrganizationByTenantId(issueCredentialDto?.contextCorrelationId);
+        if (agentOrg?.orgId) {
+          organisationId = agentOrg?.orgId;
+        } else {
+          agentOrg = await this.getOrganizationByOrgId(id);
+          organisationId = id;
+        }
       } else {
+        agentOrg = await this.getOrganizationByOrgId(id);
         organisationId = id;
       }
 
@@ -206,7 +225,7 @@ export class IssuanceRepository {
         credDefId = issueCredentialDto?.metadata?.['_anoncreds/credential']?.credentialDefinitionId;
       }
 
-      const credentialDetails = await this.prisma.credentials.upsert({
+      await this.prisma.credentials.upsert({
         where: {
           threadId: issueCredentialDto?.threadId
         },
@@ -233,7 +252,7 @@ export class IssuanceRepository {
         }
       });
 
-      return credentialDetails;
+      return agentOrg;
     } catch (error) {
       this.logger.error(`Error in get saveIssuedCredentialDetails: ${error.message} `);
       throw error;
