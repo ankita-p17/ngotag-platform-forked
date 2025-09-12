@@ -4,7 +4,8 @@ import { IClientDetails, IIssuance, IIssueCredentials, IIssueCredentialsDefiniti
 import { IssuanceService } from './issuance.service';
 import { ICredentialOfferResponse, IDeletedIssuanceRecords, IIssuedCredential } from '@credebl/common/interfaces/issuance.interface';
 import { OOBIssueCredentialDto } from 'apps/api-gateway/src/issuance/dtos/issuance.dto';
-import { user } from '@prisma/client';
+// eslint-disable-next-line camelcase
+import { org_agents, user } from '@prisma/client';
 
 @Controller()
 export class IssuanceController {
@@ -40,7 +41,8 @@ export class IssuanceController {
 
 
   @MessagePattern({ cmd: 'webhook-get-issue-credential' })
-  async getIssueCredentialWebhook(payload: IssueCredentialWebhookPayload): Promise<object> {
+  // eslint-disable-next-line camelcase
+  async getIssueCredentialWebhook(payload: IssueCredentialWebhookPayload): Promise<org_agents> {
     return this.issuanceService.getIssueCredentialWebhook(payload);
   }
 

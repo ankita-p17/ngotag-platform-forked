@@ -5,7 +5,7 @@ import { map } from 'rxjs/operators';
 import { IGetAllProofPresentations, IProofRequestSearchCriteria, IGetProofPresentationById, IProofPresentation, IProofRequestPayload, IRequestProof, ISendProofRequestPayload, IVerifyPresentation, IVerifiedProofData, IInvitation } from './interfaces/verification.interface';
 import { VerificationRepository } from './repositories/verification.repository';
 import { ATTRIBUTE_NAME_REGEX, CommonConstants } from '@credebl/common/common.constant';
-import { RecordType, agent_invitations, org_agents, organisation, presentations, user } from '@prisma/client';
+import { RecordType, agent_invitations, org_agents, organisation, user } from '@prisma/client';
 import { AutoAccept, OrgAgentType, VerificationProcessState } from '@credebl/enum/enum';
 import { ResponseMessages } from '@credebl/common/response-messages';
 import * as QRCode from 'qrcode';
@@ -361,7 +361,7 @@ export class VerificationService {
     }
   }
 
-  async webhookProofPresentation(proofPresentationPayload: IProofPresentation): Promise<presentations> {
+  async webhookProofPresentation(proofPresentationPayload: IProofPresentation): Promise<org_agents> {
     try {
       const proofPresentation = await this.verificationRepository.storeProofPresentation(proofPresentationPayload);
       return proofPresentation;
@@ -406,7 +406,6 @@ export class VerificationService {
       if (true === reuseConnection) {
         const invitation: agent_invitations = await this.verificationRepository.getInvitationDidByOrgId(user.orgId);
         invitationDid = invitation?.invitationDid ?? undefined;
-
       }
       outOfBandRequestProof.autoAcceptProof = outOfBandRequestProof.autoAcceptProof || AutoAccept.Always;
 

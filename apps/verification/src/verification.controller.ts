@@ -3,7 +3,8 @@ import { VerificationService } from './verification.service';
 import { MessagePattern } from '@nestjs/microservices';
 import { IProofPresentation, IProofPresentationData, IProofRequests, IRequestProof, ISendProofRequestPayload } from './interfaces/verification.interface';
 import { IUserRequest } from '@credebl/user-request/user-request.interface';
-import { presentations, user } from '@prisma/client';
+// eslint-disable-next-line camelcase
+import { org_agents, user } from '@prisma/client';
 import { IProofPresentationDetails, IProofPresentationList, IVerificationRecords } from '@credebl/common/interfaces/verification.interface';
 
 @Controller()
@@ -64,7 +65,8 @@ export class VerificationController {
    * @returns proof presentation details
    */
   @MessagePattern({ cmd: 'webhook-proof-presentation' })
-  async webhookProofPresentation(payload: IProofPresentation): Promise<presentations> {
+  // eslint-disable-next-line camelcase
+  async webhookProofPresentation(payload: IProofPresentation): Promise<org_agents> {
     return this.verificationService.webhookProofPresentation(payload);
   }
 
