@@ -94,8 +94,8 @@ jobs:
         run: |
           FAMILY=$(sed -n 's/.*"family": "\(.*\)",/\1/p' prod-taskdef/cloud-wallet-service.json)
           NAME=$(sed -n 's/.*"name": "\(.*\)",/\1/p' prod-taskdef/cloud-wallet-service.json)
-          # Production service name is simply "cloud-wallet" as specified
-          SERVICE_NAME="cloud-wallet"
+          # Production service name is "cloud-wallet-service"
+          SERVICE_NAME="cloud-wallet-service"
           
           echo "Family: $FAMILY"
           echo "Container Name: $NAME"
