@@ -4,7 +4,7 @@ FROM node:18-alpine3.18 as builder
 # Install OS-level dependencies
 RUN apk add --no-cache --update postgresql-client openssl1.1-compat
 
-# Install pnpm
+# Install pnpm and increase Node.js memory limit
 RUN npm install -g pnpm --ignore-scripts
 
 WORKDIR /app
@@ -18,6 +18,9 @@ RUN pnpm i --frozen-lockfile
 
 # Copy the rest of the source code
 COPY . .
+
+# Generate Prisma client at build time
+RUN npx prisma generate --schema=./libs/prisma-service/prisma/schema.prisma
 
 # Stage 2: Create the final, lean production image
 FROM node:18-alpine3.18
@@ -34,13 +37,16 @@ COPY --from=builder /app/package.json ./
 COPY --from=builder /app/libs ./libs
 COPY --from=builder /app/node_modules ./node_modules
 
-# Copy tsconfig files for ts-node
+# Copy tsconfig files for any remaining runtime compilation
 COPY --from=builder /app/tsconfig.json ./
 COPY --from=builder /app/tsconfig.build.json ./
 
 # Create symlink for prisma data files to where seed script expects them
 RUN ln -s /app/libs/prisma-service/prisma /app/prisma
 
+# Set Node.js memory limits to prevent segmentation faults
+ENV NODE_OPTIONS="--max-old-space-size=1536 --max-semi-space-size=128"
+
 # Set the command to run the seed script
-# Generate client at runtime, then run migrations and seed
-CMD ["sh", "-c", "npx prisma generate --schema=./libs/prisma-service/prisma/schema.prisma && npx prisma migrate deploy --schema=./libs/prisma-service/prisma/schema.prisma && npx prisma db seed"]
+# Use node directly with ts-node/register to avoid compilation issues
+CMD ["sh", "-c", "npx prisma generate --schema=./libs/prisma-service/prisma/schema.prisma && npx prisma migrate deploy --schema=./libs/prisma-service/prisma/schema.prisma && node --max-old-space-size=1536 -r ts-node/register libs/prisma-service/prisma/seed.ts"]
