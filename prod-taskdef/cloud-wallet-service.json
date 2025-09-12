@@ -1,5 +1,5 @@
 {
-    "family": "PROD_CLOUD_WALLET_SERVICE_TASKDEFINITION",
+    "family": "PROD_CLOUD_WALLET_TASKDEFINITION",
     "containerDefinitions": [
         {
             "name": "cloud-wallet",
@@ -22,7 +22,7 @@
                 "logDriver": "awslogs",
                 "options": {
                     "awslogs-create-group": "true",
-                    "awslogs-group": "/ecs/PROD_CLOUD_WALLET_SERVICE_TASKDEFINITION",
+                    "awslogs-group": "/ecs/PROD_CLOUD_WALLET_TASKDEFINITION",
                     "awslogs-region": "ap-southeast-1",
                     "awslogs-stream-prefix": "ecs"
                 },
