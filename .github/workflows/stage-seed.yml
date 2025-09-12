@@ -1,4 +1,4 @@
-name: Build and deploy LEDGER  app to QA ECS 
+name: Build and deploy SEED app to Stage ECS 
 
 on:
   push:
@@ -63,8 +63,8 @@ jobs:
       - name: Build, tag, and push image to Amazon ECR
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-          ECR_REPOSITORY: qa-services
-          IMAGE_TAG: "SEED_V_$${{ github.run_number }}"
+          ECR_REPOSITORY: stage-services
+          IMAGE_TAG: "SEED_V_${{ github.run_number }}"
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfiles/Dockerfile.seed .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
@@ -73,8 +73,8 @@ jobs:
       - name: Set environment variables
         run: |
           echo "ECR_REGISTRY=${{ steps.login-ecr.outputs.registry }}" >> $GITHUB_ENV
-          echo "ECR_REPOSITORY=qa-services" >> $GITHUB_ENV
-          echo "IMAGE_TAG=SEED_V_$${{ github.run_number }}" >> $GITHUB_ENV
+          echo "ECR_REPOSITORY=stage-services" >> $GITHUB_ENV
+          echo "IMAGE_TAG=SEED_V_${{ github.run_number }}" >> $GITHUB_ENV
    
       - name: Print environment variables
         run: |
