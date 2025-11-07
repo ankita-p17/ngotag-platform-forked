@@ -1,5 +1,6 @@
 import { CloudWalletType } from '@credebl/enum/enum';
 import { $Enums } from '@prisma/client';
+import { IRecordOfString } from 'apps/api-gateway/src/cloud-wallet/dtos/cloudWallet.dto';
 import { JsonValue, SingleOrArray } from 'apps/api-gateway/src/issuance/utils/helper';
 
 export class ICreateCloudWallet {
@@ -130,6 +131,12 @@ export interface IAcceptProofRequest {
 export interface ICheckCloudWalletStatus {
   userId: string;
   email: string;
+}
+
+export interface UpdateDIDByConnectionId {
+  userId: string;
+  email: string;
+  dids:IRecordOfString
 }
 
 export interface IDeclineProofRequest {
