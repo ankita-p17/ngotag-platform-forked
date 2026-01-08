@@ -61,7 +61,7 @@ export class CreateOutOfBandConnectionInvitation {
         @ApiPropertyOptional()
         @IsString()
         @IsOptional()
-        @IsNotEmpty({ message: 'Please provide recipientKey' })
+        @IsNotEmpty({ message: 'Please provide valid recipientKey' })
         recipientKey: string;
 
         @ApiPropertyOptional()
